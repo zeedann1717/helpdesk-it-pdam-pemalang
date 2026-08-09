@@ -23,4 +23,10 @@ class Divisi extends Model
     {
         return $this->hasMany(Tiket::class);
     }
+
+    // ==== TAMBAHAN BARU ====
+    public function lokasis()
+    {
+        return $this->hasMany(Lokasi::class);
+    }
 }

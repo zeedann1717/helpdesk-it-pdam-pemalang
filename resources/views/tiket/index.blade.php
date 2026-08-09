@@ -31,6 +31,7 @@
                     <th>Kode Tiket</th>
                     <th>User</th>
                     <th>Devisi</th>
+                    <th>Lokasi</th> <!-- Tambahan Baru -->
                     <th>Unit</th>
                     <th>Kendala</th>
                     <th>Tanggal Buat</th>
@@ -45,6 +46,7 @@
                         <td>{{ $tiket->kode_tiket }}</td>
                         <td>{{ $tiket->user->name }}</td>
                         <td>{{ $tiket->divisi?->nama_divisi ?? '-' }}</td>
+                        <td>{{ $tiket->lokasi?->nama_lokasi ?? '-' }}</td> <!-- Tambahan Baru -->
                         <td>{{ $tiket->unit ?? '-' }}</td>
                         <td>{{ Str::limit($tiket->keluhan, 35) }}</td>
                         <td>{{ $tiket->created_at->format('d-m-Y H:i') }}</td>
@@ -52,7 +54,9 @@
                         <td><a href="{{ route('tiket.show', $tiket) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada data tiket.</td></tr>
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-4">Belum ada data tiket.</td> <!-- Ubah colspan jadi 10 -->
+                    </tr>
                 @endforelse
             </tbody>
         </table>

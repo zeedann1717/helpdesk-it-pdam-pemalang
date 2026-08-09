@@ -30,7 +30,7 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label">Devisi</label>
-                    <select name="divisi_id" class="form-select" required>
+                    <select name="divisi_id" id="divisiSelect" class="form-select" required>
                         <option value="">Pilih devisi...</option>
                         @foreach ($divisis as $divisi)
                             <option value="{{ $divisi->id }}" @selected(old('divisi_id') == $divisi->id || auth()->user()->divisi_id == $divisi->id)>
@@ -45,11 +45,8 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label">Lokasi</label>
-                    <select name="lokasi_id" class="form-select" required>
-                        <option value="">Pilih lokasi...</option>
-                        @foreach ($lokasis as $lokasi)
-                            <option value="{{ $lokasi->id }}" @selected(old('lokasi_id') == $lokasi->id)>{{ $lokasi->nama_lokasi }}</option>
-                        @endforeach
+                    <select name="lokasi_id" id="lokasiSelect" class="form-select" required disabled>
+                        <option value="">Pilih devisi dahulu...</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
@@ -69,3 +66,54 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const divisiSelect = document.getElementById('divisiSelect');
+    const lokasiSelect = document.getElementById('lokasiSelect');
+    const oldLokasiId = '{{ old('lokasi_id') }}';
+
+    function loadLokasi(divisiId) {
+        if (!divisiId) {
+            lokasiSelect.innerHTML = '<option value="">Pilih devisi dahulu...</option>';
+            lokasiSelect.disabled = true;
+            return;
+        }
+
+        lokasiSelect.disabled = true;
+        lokasiSelect.innerHTML = '<option value="">Memuat lokasi...</option>';
+
+        fetch(`/lokasi/by-divisi/${divisiId}`, { headers: { 'Accept': 'application/json' } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    lokasiSelect.innerHTML = '<option value="">Belum ada lokasi untuk devisi ini</option>';
+                    lokasiSelect.disabled = true;
+                    return;
+                }
+
+                let options = '<option value="">Pilih lokasi...</option>';
+                data.forEach(l => {
+                    const selected = String(l.id) === oldLokasiId ? 'selected' : '';
+                    options += `<option value="${l.id}" ${selected}>${l.nama_lokasi}</option>`;
+                });
+                lokasiSelect.innerHTML = options;
+                lokasiSelect.disabled = false;
+            })
+            .catch(() => {
+                lokasiSelect.innerHTML = '<option value="">Gagal memuat lokasi</option>';
+            });
+    }
+
+    divisiSelect.addEventListener('change', function () {
+        loadLokasi(this.value);
+    });
+
+    // Kalau Divisi sudah terpilih dari awal (misal otomatis dari profil user), langsung fetch data lokasinya
+    if (divisiSelect.value) {
+        loadLokasi(divisiSelect.value);
+    }
+})();
+</script>
+@endpush

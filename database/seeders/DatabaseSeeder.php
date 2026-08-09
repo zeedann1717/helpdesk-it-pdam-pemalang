@@ -23,21 +23,11 @@ class DatabaseSeeder extends Seeder
      * laporan magang.
      */
     public function run(): void
-    {
-        $divisis = [
-            ['kode_divisi' => 'DIR', 'nama_divisi' => 'Direksi'],
-            ['kode_divisi' => 'UMKEP', 'nama_divisi' => 'Bagian Umum dan Kepegawaian'],
-            ['kode_divisi' => 'KEU', 'nama_divisi' => 'Bagian Keuangan'],
-            ['kode_divisi' => 'HL', 'nama_divisi' => 'Bagian Hubungan Langganan'],
-            ['kode_divisi' => 'TI', 'nama_divisi' => 'Bagian Teknologi Informasi'],
-            ['kode_divisi' => 'PRD', 'nama_divisi' => 'Bagian Produksi'],
-            ['kode_divisi' => 'DIST', 'nama_divisi' => 'Bagian Distribusi'],
-            ['kode_divisi' => 'PERC', 'nama_divisi' => 'Bagian Perencanaan Teknik'],
-            ['kode_divisi' => 'SPI', 'nama_divisi' => 'Satuan Pengawas Internal'],
-        ];
-
-        foreach ($divisis as $d) {
-            Divisi::firstOrCreate(['kode_divisi' => $d['kode_divisi']], $d);
+        {
+            $this->call([
+                DivisiSeeder::class,
+                LokasiSeeder::class,
+            ]);
         }
 
         $lokasis = [

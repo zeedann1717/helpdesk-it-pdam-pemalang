@@ -12,10 +12,17 @@ class Lokasi extends Model
     protected $fillable = [
         'nama_lokasi',
         'keterangan',
+        'divisi_id', // TAMBAHAN BARU
     ];
 
     public function tikets()
     {
         return $this->hasMany(Tiket::class);
+    }
+
+    // ==== TAMBAHAN BARU ====
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class);
     }
 }

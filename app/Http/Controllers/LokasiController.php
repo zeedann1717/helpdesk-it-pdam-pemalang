@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Divisi;
 use App\Models\Lokasi;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -11,9 +13,10 @@ class LokasiController extends Controller
 {
     public function index(): View
     {
-        $lokasis = Lokasi::withCount('tikets')->orderBy('nama_lokasi')->paginate(10);
+        $lokasis = Lokasi::withCount('tikets')->with('divisi')->orderBy('nama_lokasi')->paginate(10);
+        $divisis = Divisi::orderBy('nama_divisi')->get();
 
-        return view('lokasi.index', compact('lokasis'));
+        return view('lokasi.index', compact('lokasis', 'divisis'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -21,6 +24,7 @@ class LokasiController extends Controller
         $data = $request->validate([
             'nama_lokasi' => ['required', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string', 'max:255'],
+            'divisi_id' => ['required', 'exists:divisis,id'], // TAMBAHAN BARU
         ]);
 
         Lokasi::create($data);
@@ -33,6 +37,7 @@ class LokasiController extends Controller
         $data = $request->validate([
             'nama_lokasi' => ['required', 'string', 'max:255'],
             'keterangan' => ['nullable', 'string', 'max:255'],
+            'divisi_id' => ['required', 'exists:divisis,id'], // TAMBAHAN BARU
         ]);
 
         $lokasi->update($data);
@@ -49,5 +54,17 @@ class LokasiController extends Controller
         $lokasi->delete();
 
         return back()->with('success', 'Data lokasi berhasil dihapus.');
+    }
+
+    /**
+     * Endpoint AJAX: ambil daftar lokasi berdasarkan divisi tertentu.
+     */
+    public function byDivisi(Divisi $divisi): JsonResponse
+    {
+        $lokasis = $divisi->lokasis()
+            ->orderBy('nama_lokasi')
+            ->get(['id', 'nama_lokasi']);
+
+        return response()->json($lokasis);
     }
 }

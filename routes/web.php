@@ -6,6 +6,7 @@ use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\TiketController;
+use App\Http\Controllers\TiketChatController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/tiket', [TiketController::class, 'store'])->name('tiket.store');
     Route::get('/tiket/saya', [TiketController::class, 'my'])->name('tiket.my');
     Route::get('/tiket/{tiket}', [TiketController::class, 'show'])->name('tiket.show');
+
+    // ==== TAMBAHAN BARU: Endpoint AJAX Lokasi by Divisi ====
+    Route::get('/lokasi/by-divisi/{divisi}', [LokasiController::class, 'byDivisi'])->name('lokasi.byDivisi');
+
+    // Live Chat per tiket (user & admin)
+    Route::get('/tiket/{tiket}/chat', [TiketChatController::class, 'index'])->name('tiket.chat.index');
+    Route::post('/tiket/{tiket}/chat', [TiketChatController::class, 'store'])->name('tiket.chat.store');
 
     // ==== Admin only ====
     Route::middleware('admin')->group(function () {

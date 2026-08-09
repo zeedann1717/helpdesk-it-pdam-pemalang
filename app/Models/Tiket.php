@@ -77,6 +77,14 @@ class Tiket extends Model
         return $this->belongsTo(Lokasi::class);
     }
 
+    // ==== TAMBAHAN BARU ====
+    // Riwayat chat/percakapan pada tiket ini (user <-> admin), diurutkan dari yang paling lama.
+    public function messages()
+    {
+        return $this->hasMany(TicketMessage::class)->orderBy('created_at');
+    }
+    // ==== AKHIR TAMBAHAN ====
+
     public function scopeStatus($query, string $status)
     {
         return $query->where('status', $status);

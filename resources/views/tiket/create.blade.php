@@ -115,5 +115,22 @@
         loadLokasi(divisiSelect.value);
     }
 })();
+
+// ==== TAMBAHAN: cegah submit ganda dengan menonaktifkan tombol setelah diklik ====
+(function () {
+    const form = document.querySelector('form[action="{{ route('tiket.store') }}"]');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+        const btn = this.querySelector('button[type="submit"]');
+        if (btn.disabled) {
+            e.preventDefault(); // jaga-jaga kalau event sempat terpanggil dobel
+            return;
+        }
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Mengirim...';
+    });
+})();
+// ==== AKHIR TAMBAHAN ====
 </script>
 @endpush

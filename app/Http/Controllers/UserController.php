@@ -79,4 +79,19 @@ class UserController extends Controller
 
         return back()->with('success', 'Data user berhasil dihapus.');
     }
+
+    /**
+     * ==== TAMBAHAN BARU ====
+     * Admin reset password user lain langsung (tanpa lewat alur permintaan).
+     */
+    public function resetPassword(Request $request, User $user): RedirectResponse
+    {
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user->update(['password' => Hash::make($data['password'])]);
+
+        return back()->with('success', 'Password user '.$user->name.' berhasil direset.');
+    }
 }

@@ -11,6 +11,8 @@
     <meta name="reverb-scheme" content="{{ config('broadcasting.connections.reverb.options.scheme', 'http') }}">
     <meta name="auth-user-id" content="{{ auth()->id() }}">
     <meta name="auth-is-admin" content="{{ auth()->user()->isAdmin() ? '1' : '0' }}">
+    {{-- TAMBAHAN BARU: nama route saat ini, dipakai untuk auto-refresh saat tiket baru masuk --}}
+    <meta name="route-name" content="{{ request()->route()->getName() }}">
     <title>@yield('title', 'Dashboard') - Help Desk IT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -139,6 +141,12 @@
                 <a href="{{ route('laporan.index') }}" class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-file-lines me-2"></i> Laporan</span>
                 </a>
+
+                {{-- TAMBAHAN BARU: Permintaan Reset Password (admin) --}}
+                <a href="{{ route('passwordRequests.index') }}" class="{{ request()->routeIs('passwordRequests.*') ? 'active' : '' }}">
+                    <span><i class="fa-solid fa-key me-2"></i> Reset Password Requests</span>
+                    <span class="nav-badge" id="badgeResetRequest">0</span>
+                </a>
             @else
                 <a href="{{ route('tiket.create') }}" class="{{ request()->routeIs('tiket.create') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-plus me-2"></i> Buat Tiket</span>
@@ -148,6 +156,11 @@
                     <span class="nav-badge" id="badgeTiketMasuk">0</span>
                 </a>
             @endif
+
+            {{-- TAMBAHAN BARU: Profile Saya (semua role) --}}
+            <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <span><i class="fa-solid fa-user-gear me-2"></i> Profile Saya</span>
+            </a>
 
             <form method="POST" action="{{ route('logout') }}" class="mt-2">
                 @csrf
@@ -267,6 +280,65 @@
     // Dengarkan channel notifikasi sesuai role
     if (isAdmin) {
         window.Echo.private('admins').listen('.new-message', (e) => showChatToast(e));
+
+        // ==== TAMBAHAN BARU: notifikasi tiket baru masuk (khusus admin) ====
+        const routeName = meta('route-name');
+        const refreshableRoutes = ['dashboard', 'tiket.index', 'tiket.waiting'];
+
+        window.Echo.private('admins').listen('.new-ticket', (e) => {
+            unread += 1;
+            updateBadges();
+
+            const stack = document.getElementById('chatToastStack');
+            const el = document.createElement('div');
+            el.className = 'chat-toast';
+            el.style.borderLeftColor = '#16a34a';
+            el.innerHTML = `
+                <div class="avatar" style="background:#16a34a;"><i class="fa-solid fa-ticket"></i></div>
+                <div class="body">
+                    <div class="title">Tiket Baru &middot; ${e.kode_tiket}</div>
+                    <div class="msg">${e.user_name} (${e.divisi ?? '-'}): ${e.keluhan}</div>
+                </div>
+            `;
+            el.addEventListener('click', () => { window.location.href = `/tiket/${e.id}`; });
+            stack.appendChild(el);
+            setTimeout(() => el.remove(), 6000);
+
+            // Kalau admin sedang di halaman Dashboard / Daftar Tiket / Tiket Waiting,
+            // muat ulang otomatis biar data langsung update tanpa perlu refresh manual.
+            if (refreshableRoutes.includes(routeName)) {
+                setTimeout(() => window.location.reload(), 1500);
+            }
+        });
+        // ==== AKHIR TAMBAHAN new-ticket ====
+
+        // ==== TAMBAHAN BARU: notifikasi permintaan reset password (khusus admin) ====
+        window.Echo.private('admins').listen('.password-reset-requested', (e) => {
+            unread += 1;
+            updateBadges();
+
+            const badgeReq = document.getElementById('badgeResetRequest');
+            if (badgeReq) {
+                badgeReq.style.display = 'inline-block';
+                badgeReq.textContent = (parseInt(badgeReq.textContent) || 0) + 1;
+            }
+
+            const stack = document.getElementById('chatToastStack');
+            const el = document.createElement('div');
+            el.className = 'chat-toast';
+            el.style.borderLeftColor = '#f59e0b';
+            el.innerHTML = `
+                <div class="avatar" style="background:#f59e0b;"><i class="fa-solid fa-key"></i></div>
+                <div class="body">
+                    <div class="title">Permintaan Reset Password</div>
+                    <div class="msg">${e.name} (${e.username})</div>
+                </div>
+            `;
+            el.addEventListener('click', () => { window.location.href = "{{ route('passwordRequests.index') }}"; });
+            stack.appendChild(el);
+            setTimeout(() => el.remove(), 6000);
+        });
+        // ==== AKHIR TAMBAHAN password-reset-requested ====
     } else if (userId) {
         window.Echo.private(`App.Models.User.${userId}`).listen('.new-message', (e) => showChatToast(e));
     }

@@ -30,10 +30,16 @@
             <label class="form-label">Username</label>
             <input type="text" name="username" value="{{ old('username') }}" class="form-control" required autofocus>
         </div>
-        <div class="mb-3">
+        <div class="mb-2">
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" required>
         </div>
+
+        {{-- ==== TAMBAHAN BARU: link Lupa Password ==== --}}
+        <div class="text-end mb-3">
+            <a href="{{ route('password.request') }}" class="small text-decoration-none">Lupa password?</a>
+        </div>
+
         <div class="form-check mb-3">
             <input type="checkbox" name="remember" class="form-check-input" id="remember">
             <label class="form-check-label" for="remember">Ingat saya</label>

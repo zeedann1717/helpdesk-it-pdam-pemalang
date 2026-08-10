@@ -222,6 +222,11 @@
     const isAdmin = meta('auth-is-admin') === '1';
     const reverbScheme = meta('reverb-scheme') || 'http';
 
+    // Penanda global: baru true kalau instance Echo BENERAN berhasil dibikin.
+    // Dipakai di halaman lain (mis. tiket/show.blade.php) supaya gak crash
+    // manggil window.Echo.private() padahal Reverb belum aktif.
+    window.echoReady = false;
+
     if (!window.Pusher || !window.Echo || !meta('reverb-key')) {
         console.warn('Reverb belum dikonfigurasi (cek .env REVERB_APP_KEY dkk).');
         return;
@@ -237,6 +242,7 @@
         enabledTransports: ['ws', 'wss'],
         auth: { headers: { 'X-CSRF-TOKEN': csrfToken } },
     });
+    window.echoReady = true;
 
     let unread = 0;
     const dot = document.getElementById('notifDot');
@@ -352,3 +358,4 @@
 @stack('scripts')
 </body>
 </html>
+PHPEOF

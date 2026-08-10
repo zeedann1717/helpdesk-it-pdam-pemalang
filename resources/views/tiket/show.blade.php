@@ -249,7 +249,7 @@
     });
 
     // Fitur Broadcast/Websocket (Opsional)
-    if (window.Echo) {
+    if (window.echoReady) {
         window.Echo.private(`tiket.${tiketId}`).listen('.new-message', (e) => {
             if (e.sender_id === currentUserId) return;
             document.querySelector('.chat-empty')?.remove();

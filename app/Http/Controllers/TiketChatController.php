@@ -1,8 +1,10 @@
 <?php
 namespace App\Http\Controllers;
+use App\Events\NewTicketMessage;
 use App\Models\Tiket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 class TiketChatController extends Controller
 {
     private function bolehAkses($user, Tiket $tiket): bool
@@ -33,46 +35,33 @@ class TiketChatController extends Controller
         });
         return response()->json($messages);
     }
-    public function store(Request $request): RedirectResponse
+
+    public function store(Request $request, Tiket $tiket): JsonResponse
     {
+        $user = $request->user();
+        abort_unless($this->bolehAkses($user, $tiket), 403);
         $data = $request->validate([
-            'divisi_id' => ['required', 'exists:divisis,id'],
-            'lokasi_id' => ['required', 'exists:lokasis,id'],
-            'unit' => ['required', 'string', 'max:255'],
-            'keluhan' => ['required', 'string', 'max:2000'],
-            'foto' => ['nullable', 'image', 'max:2048'],
+            'message' => ['required', 'string', 'max:2000'],
+        ]);
+        $pesan = $tiket->messages()->create([
+            'user_id' => $user->id,
+            'message' => $data['message'],
         ]);
 
-        $data['user_id'] = $request->user()->id;
+        // Broadcast real-time ke lawan bicara / semua admin lewat Reverb
+        broadcast(new NewTicketMessage($pesan))->toOthers();
 
-        // ==== TAMBAHAN: cegah tiket dobel akibat submit ganda ====
-        $duplikat = Tiket::where('user_id', $data['user_id'])
-            ->where('divisi_id', $data['divisi_id'])
-            ->where('lokasi_id', $data['lokasi_id'])
-            ->where('unit', $data['unit'])
-            ->where('keluhan', $data['keluhan'])
-            ->where('created_at', '>=', now()->subSeconds(15))
-            ->first();
-
-        if ($duplikat) {
-            return redirect()
-                ->route('tiket.show', $duplikat)
-                ->with('success', 'Tiket sudah tercatat sebelumnya dengan kode '.$duplikat->kode_tiket.'.');
-        }
-        // ==== AKHIR TAMBAHAN ====
-
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('foto_tiket', 'public');
-        }
-
-        $tiket = Tiket::create($data);
-
-        // ==== TAMBAHAN: broadcast realtime ke admin (lihat Bug 2 di bawah) ====
-        broadcast(new \App\Events\NewTicketCreated($tiket))->toOthers();
-        // ==== AKHIR TAMBAHAN ====
-
-        return redirect()
-            ->route('tiket.show', $tiket)
-            ->with('success', 'Tiket berhasil dibuat dengan kode '.$tiket->kode_tiket.'.');
+        return response()->json([
+            'status' => 'ok',
+            'data' => [
+                'id' => $pesan->id,
+                'message' => $pesan->message,
+                'sender_id' => $user->id,
+                'sender_name' => $user->name,
+                'sender_is_admin' => $user->isAdmin(),
+                'is_me' => true,
+                'created_at' => $pesan->created_at->format('d-m-Y H:i'),
+            ],
+        ]);
     }
 }

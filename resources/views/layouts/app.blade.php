@@ -108,7 +108,7 @@
 <div class="d-flex flex-column flex-md-row">
     <nav class="sidebar" style="width: 250px; flex-shrink: 0;">
         <div class="brand d-flex align-items-center gap-2">
-            <i class="fa-solid fa-droplet fs-4"></i>
+            <img src="{{ asset('images/logopdam.jpg') }}" alt="Logo PDAM" style="width:28px;height:28px;object-fit:contain;">
             <div>
                 <div class="fw-bold">Help Desk IT</div>
                 <small class="text-white-50">PDAM Tirta Mulia</small>

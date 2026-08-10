@@ -45,8 +45,27 @@ class User extends Authenticatable
         return $this->hasMany(Tiket::class);
     }
 
+    /**
+     * Super Admin (IT Pusat): akses penuh ke semua data & semua divisi.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    /**
+     * Admin Divisi: cuma bisa kelola tiket di divisinya sendiri.
+     */
+    public function isAdminDivisi(): bool
+    {
+        return $this->role === 'admin_divisi';
+    }
+
+    /**
+     * True untuk kedua jenis admin (dipakai buat pengecekan akses umum).
+     */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['super_admin', 'admin_divisi'], true);
     }
 }

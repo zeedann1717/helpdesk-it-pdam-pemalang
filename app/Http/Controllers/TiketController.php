@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Divisi;
 use App\Models\Lokasi;
 use App\Models\Tiket;
@@ -9,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-
 class TiketController extends Controller
 {
     /**
@@ -19,10 +16,8 @@ class TiketController extends Controller
     {
         $divisis = Divisi::orderBy('nama_divisi')->get();
         $lokasis = Lokasi::orderBy('nama_lokasi')->get();
-
         return view('tiket.create', compact('divisis', 'lokasis'));
     }
-
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -32,54 +27,52 @@ class TiketController extends Controller
             'keluhan' => ['required', 'string', 'max:2000'],
             'foto' => ['nullable', 'image', 'max:2048'],
         ]);
-
         $data['user_id'] = $request->user()->id;
-
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('foto_tiket', 'public');
         }
-
         $tiket = Tiket::create($data);
-
         return redirect()
             ->route('tiket.show', $tiket)
             ->with('success', 'Tiket berhasil dibuat dengan kode '.$tiket->kode_tiket.'.');
     }
-
     /**
-     * Daftar semua tiket (admin), dengan filter status opsional.
+     * Daftar semua tiket. Super Admin lihat semua, Admin Divisi lihat divisinya aja.
      */
     public function index(Request $request): View
     {
         $query = Tiket::with(['user', 'divisi', 'lokasi'])->latest();
 
+        if ($request->user()->isAdminDivisi()) {
+            $query->where('divisi_id', $request->user()->divisi_id);
+        }
+
         if ($request->filled('status')) {
             $query->status($request->string('status'));
         }
-
         if ($request->filled('cari')) {
             $cari = $request->string('cari');
             $query->where('kode_tiket', 'like', "%{$cari}%");
         }
-
         $tikets = $query->paginate(15)->withQueryString();
-
         return view('tiket.index', compact('tikets'));
     }
-
     /**
-     * Daftar tiket berstatus waiting saja (admin).
+     * Daftar tiket berstatus waiting saja. Super Admin lihat semua, Admin Divisi lihat divisinya aja.
      */
-    public function waiting(): View
+    public function waiting(Request $request): View
     {
-        $tikets = Tiket::with(['user', 'divisi', 'lokasi'])
+        $query = Tiket::with(['user', 'divisi', 'lokasi'])
             ->status('waiting')
-            ->latest()
-            ->paginate(15);
+            ->latest();
 
+        if ($request->user()->isAdminDivisi()) {
+            $query->where('divisi_id', $request->user()->divisi_id);
+        }
+
+        $tikets = $query->paginate(15);
         return view('tiket.waiting', compact('tikets'));
     }
-
     /**
      * Riwayat tiket milik user yang sedang login.
      */
@@ -89,47 +82,47 @@ class TiketController extends Controller
             ->where('user_id', $request->user()->id)
             ->latest()
             ->paginate(10);
-
         return view('tiket.my', compact('tikets'));
     }
-
     public function show(Request $request, Tiket $tiket): View
     {
         $user = $request->user();
-
-        abort_unless($user->isAdmin() || $tiket->user_id === $user->id, 403);
-
+        $bolehLihat = $user->isSuperAdmin()
+            || ($user->isAdminDivisi() && $tiket->divisi_id === $user->divisi_id)
+            || $tiket->user_id === $user->id;
+        abort_unless($bolehLihat, 403);
         $tiket->load(['user', 'divisi', 'lokasi']);
-
         return view('tiket.show', compact('tiket'));
     }
-
     /**
-     * Update status tiket oleh admin.
+     * Update status tiket. Admin Divisi cuma boleh update tiket divisinya.
      */
     public function updateStatus(Request $request, Tiket $tiket): RedirectResponse
     {
+        $user = $request->user();
+        $bolehUpdate = $user->isSuperAdmin()
+            || ($user->isAdminDivisi() && $tiket->divisi_id === $user->divisi_id);
+        abort_unless($bolehUpdate, 403);
+
         $data = $request->validate([
             'status' => ['required', 'in:waiting,in_progress,done'],
             'catatan_admin' => ['nullable', 'string', 'max:2000'],
         ]);
-
         $data['tanggal_selesai'] = $data['status'] === 'done' ? now() : null;
-
         $tiket->update($data);
-
         return back()->with('success', 'Status tiket berhasil diperbarui.');
     }
-
     public function destroyFoto(Request $request, Tiket $tiket): RedirectResponse
     {
-        abort_unless($request->user()->isAdmin(), 403);
+        $user = $request->user();
+        $bolehHapus = $user->isSuperAdmin()
+            || ($user->isAdminDivisi() && $tiket->divisi_id === $user->divisi_id);
+        abort_unless($bolehHapus, 403);
 
         if ($tiket->foto) {
             Storage::disk('public')->delete($tiket->foto);
             $tiket->update(['foto' => null]);
         }
-
         return back()->with('success', 'Foto tiket berhasil dihapus.');
     }
 }

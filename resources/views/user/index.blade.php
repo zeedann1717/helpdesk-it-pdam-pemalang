@@ -45,7 +45,7 @@
                         <td>{{ $user->jenis_kelamin ?? '-' }}</td>
                         <td>{{ $user->no_hp ?? '-' }}</td>
                         <td>{{ $user->divisi?->nama_divisi ?? '-' }}</td>
-                        <td><span class="badge {{ $user->role === 'admin' ? 'bg-primary' : 'bg-secondary' }}">{{ ucfirst($user->role) }}</span></td>
+                        <td><span class="badge {{ $user->role === 'super_admin' ? 'bg-primary' : ($user->role === 'admin_divisi' ? 'bg-info text-dark' : 'bg-secondary') }}">{{ $user->role === 'super_admin' ? 'Super Admin' : ($user->role === 'admin_divisi' ? 'Admin Divisi' : 'User') }}</span></td>
                         <td>
                             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
                                 <i class="fa-solid fa-pen"></i>
@@ -111,7 +111,8 @@
                                             <label class="form-label">Role</label>
                                             <select name="role" class="form-select" required>
                                                 <option value="user" @selected($user->role == 'user')>User</option>
-                                                <option value="admin" @selected($user->role == 'admin')>Admin</option>
+                                                <option value="admin_divisi" @selected($user->role == 'admin_divisi')>Admin Divisi</option>
+                                                <option value="super_admin" @selected($user->role == 'super_admin')>Super Admin (IT Pusat)</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
@@ -188,7 +189,8 @@
                         <label class="form-label">Role</label>
                         <select name="role" class="form-select" required>
                             <option value="user">User</option>
-                            <option value="admin">Admin</option>
+                            <option value="admin_divisi">Admin Divisi</option>
+                            <option value="super_admin">Super Admin (IT Pusat)</option>
                         </select>
                     </div>
                     <div class="mb-3">

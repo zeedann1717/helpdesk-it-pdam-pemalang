@@ -5,7 +5,7 @@
 @section('content')
 <div class="card guest-card p-4 p-md-5 bg-white">
     <div class="text-center mb-4">
-        <div class="brand-logo"><i class="fa-solid fa-droplet"></i></div>
+        <div class="brand-logo"><img src="{{ asset('images/logopdam.jpg') }}" alt="Logo PDAM Tirta Mulia Pemalang" style="width:56px;height:56px;object-fit:contain;"></div>
         <h6 class="text-primary text-uppercase fw-bold mb-1">PDAM Tirta Mulia Pemalang</h6>
         <h4 class="fw-bold">Buat Akun Baru</h4>
     </div>

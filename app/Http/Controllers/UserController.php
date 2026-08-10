@@ -27,9 +27,9 @@ class UserController extends Controller
             'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'jenis_kelamin' => ['required', 'in:Laki-laki,Perempuan'],
             'no_hp' => ['nullable', 'string', 'max:20'],
-            'divisi_id' => ['nullable', 'exists:divisis,id'],
+            'divisi_id' => ['nullable', 'exists:divisis,id', 'required_if:role,admin_divisi'],
             'unit' => ['nullable', 'string', 'max:255'],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:super_admin,admin_divisi,user'],
             'password' => ['required', 'string', 'min:6'],
         ]);
 
@@ -48,9 +48,9 @@ class UserController extends Controller
             'email' => ['nullable', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'jenis_kelamin' => ['required', 'in:Laki-laki,Perempuan'],
             'no_hp' => ['nullable', 'string', 'max:20'],
-            'divisi_id' => ['nullable', 'exists:divisis,id'],
+            'divisi_id' => ['nullable', 'exists:divisis,id', 'required_if:role,admin_divisi'],
             'unit' => ['nullable', 'string', 'max:255'],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:super_admin,admin_divisi,user'],
             'password' => ['nullable', 'string', 'min:6'],
         ]);
 

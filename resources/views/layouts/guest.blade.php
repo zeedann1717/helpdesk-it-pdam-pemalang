@@ -77,8 +77,8 @@
     <div class="guest-wrapper">
         <div class="brand-top">
             <div class="logo-box">
-                {{-- Ganti file public/images/logo-pdam.png dengan logo asli PDAM Tirta Mulia Pemalang --}}
-                <img src="{{ asset('images/logo-pdam.png') }}"
+                {{-- Ganti file public/images/logopdam.jpg dengan logo asli PDAM Tirta Mulia Pemalang --}}
+                <img src="{{ asset('images/logopdam.jpg') }}"
                      alt="Logo PDAM Tirta Mulia Pemalang"
                      onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('i'),{className:'fa-solid fa-droplet fa-2x',style:'color:#0d3b8c'}));">
             </div>

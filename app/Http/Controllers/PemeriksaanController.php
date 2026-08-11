@@ -6,6 +6,7 @@ use App\Models\ChecklistItem;
 use App\Models\Pemeriksaan;
 use App\Models\PemeriksaanItem;
 use App\Models\Perangkat;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -106,6 +107,21 @@ class PemeriksaanController extends Controller
         return view('pemeriksaan.show', compact('pemeriksaan', 'itemsByKategori'));
     }
 
+
+    public function exportPdf(Pemeriksaan $pemeriksaan)
+    {
+        $pemeriksaan->load('perangkat.lokasi', 'diinputOlehUser', 'items.checklistItem');
+
+        $itemsByKategori = $pemeriksaan->items
+            ->sortBy(fn ($item) => $item->checklistItem->urutan)
+            ->groupBy(fn ($item) => $item->checklistItem->kategori_kode);
+
+        $pdf = Pdf::loadView('pemeriksaan.pdf', compact('pemeriksaan', 'itemsByKategori'))->setPaper('a4', 'portrait');
+
+        $namaFile = 'Pemeriksaan-'.$pemeriksaan->perangkat->kode_inventaris.'-'.$pemeriksaan->tanggal_pemeriksaan->format('Ymd').'.pdf';
+
+        return $pdf->download($namaFile);
+    }
     public function destroy(Pemeriksaan $pemeriksaan): RedirectResponse
     {
         $pemeriksaan->delete();

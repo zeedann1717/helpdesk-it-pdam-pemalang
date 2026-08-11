@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pemeriksaan/buat', [PemeriksaanController::class, 'create'])->name('pemeriksaan.create');
         Route::post('/pemeriksaan', [PemeriksaanController::class, 'store'])->name('pemeriksaan.store');
         Route::get('/pemeriksaan/{pemeriksaan}', [PemeriksaanController::class, 'show'])->name('pemeriksaan.show');
+        Route::get('/pemeriksaan/{pemeriksaan}/export-pdf', [PemeriksaanController::class, 'exportPdf'])->name('pemeriksaan.exportPdf');
         Route::delete('/pemeriksaan/{pemeriksaan}', [PemeriksaanController::class, 'destroy'])->name('pemeriksaan.destroy');
         // ==== AKHIR TAMBAHAN ====
     });

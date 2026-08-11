@@ -55,6 +55,9 @@
     </div>
 @endforeach
 
+<a href="{{ route('pemeriksaan.exportPdf', $pemeriksaan) }}" class="btn btn-danger">
+    <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
+</a>
 <a href="{{ route('pemeriksaan.index') }}" class="btn btn-outline-secondary">
     <i class="fa-solid fa-arrow-left me-1"></i> Kembali
 </a>

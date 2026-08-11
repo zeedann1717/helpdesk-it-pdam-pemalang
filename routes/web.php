@@ -6,6 +6,8 @@ use App\Http\Controllers\DivisiController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PasswordResetRequestController;
+use App\Http\Controllers\PemeriksaanController;
+use App\Http\Controllers\PerangkatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\TiketChatController;
@@ -23,7 +25,6 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
-    // ==== TAMBAHAN BARU: Lupa Password ====
     Route::get('/lupa-password', [PasswordResetRequestController::class, 'create'])->name('password.request');
     Route::post('/lupa-password', [PasswordResetRequestController::class, 'store'])->name('password.request.store');
 });
@@ -47,7 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/tiket/{tiket}/chat', [TiketChatController::class, 'index'])->name('tiket.chat.index');
     Route::post('/tiket/{tiket}/chat', [TiketChatController::class, 'store'])->name('tiket.chat.store');
 
-    // ==== TAMBAHAN BARU: Profile Saya (semua role) ====
+    // Profile Saya (semua role)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
@@ -59,9 +60,22 @@ Route::middleware('auth')->group(function () {
         Route::put('/tiket/{tiket}/status', [TiketController::class, 'updateStatus'])->name('tiket.updateStatus');
         Route::delete('/tiket/{tiket}/foto', [TiketController::class, 'destroyFoto'])->name('tiket.destroyFoto');
 
-        // ==== TAMBAHAN BARU: Permintaan Reset Password ====
+        // Permintaan Reset Password
         Route::get('/reset-password-requests', [PasswordResetRequestController::class, 'index'])->name('passwordRequests.index');
         Route::put('/reset-password-requests/{passwordResetRequest}/proses', [PasswordResetRequestController::class, 'approve'])->name('passwordRequests.approve');
+
+        // ==== TAMBAHAN BARU: Pemeriksaan Berkala Perangkat (PDE) ====
+        Route::get('/perangkat', [PerangkatController::class, 'index'])->name('perangkat.index');
+        Route::post('/perangkat', [PerangkatController::class, 'store'])->name('perangkat.store');
+        Route::put('/perangkat/{perangkat}', [PerangkatController::class, 'update'])->name('perangkat.update');
+        Route::delete('/perangkat/{perangkat}', [PerangkatController::class, 'destroy'])->name('perangkat.destroy');
+
+        Route::get('/pemeriksaan', [PemeriksaanController::class, 'index'])->name('pemeriksaan.index');
+        Route::get('/pemeriksaan/buat', [PemeriksaanController::class, 'create'])->name('pemeriksaan.create');
+        Route::post('/pemeriksaan', [PemeriksaanController::class, 'store'])->name('pemeriksaan.store');
+        Route::get('/pemeriksaan/{pemeriksaan}', [PemeriksaanController::class, 'show'])->name('pemeriksaan.show');
+        Route::delete('/pemeriksaan/{pemeriksaan}', [PemeriksaanController::class, 'destroy'])->name('pemeriksaan.destroy');
+        // ==== AKHIR TAMBAHAN ====
     });
 
     // ==== Super Admin only - kelola data master ====
@@ -81,7 +95,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
         Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
 
-        // ==== TAMBAHAN BARU: Admin reset password user lain ====
         Route::put('/user/{user}/reset-password', [UserController::class, 'resetPassword'])->name('user.resetPassword');
 
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');

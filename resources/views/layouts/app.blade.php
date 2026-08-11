@@ -138,6 +138,12 @@
                 <a href="{{ route('tiket.waiting') }}" class="{{ request()->routeIs('tiket.waiting') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-clock me-2"></i> Tiket Waiting</span>
                 </a>
+                <a href="{{ route('perangkat.index') }}" class="{{ request()->routeIs('perangkat.*') ? 'active' : '' }}">
+                    <span><i class="fa-solid fa-hard-drive me-2"></i> Data Perangkat</span>
+                </a>
+                <a href="{{ route('pemeriksaan.index') }}" class="{{ request()->routeIs('pemeriksaan.*') ? 'active' : '' }}">
+                    <span><i class="fa-solid fa-clipboard-check me-2"></i> Pemeriksaan Berkala</span>
+                </a>
                 <a href="{{ route('laporan.index') }}" class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-file-lines me-2"></i> Laporan</span>
                 </a>

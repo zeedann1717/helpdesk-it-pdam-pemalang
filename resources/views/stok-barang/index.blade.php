@@ -16,6 +16,9 @@
                     @endforeach
                 </select>
             </form>
+            <a href="{{ route('stokBarang.exportPdf', request()->only('divisi_id')) }}" class="btn btn-danger btn-sm">
+                <i class="fa-solid fa-file-pdf me-1"></i> Cetak PDF
+            </a>
             <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tambahStokModal">
                 <i class="fa-solid fa-plus me-1"></i> Tambah Barang
             </button>

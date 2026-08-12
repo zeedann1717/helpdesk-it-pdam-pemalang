@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Divisi;
 use App\Models\StokBarang;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -63,5 +64,27 @@ class StokBarangController extends Controller
         $stokBarang->delete();
 
         return back()->with('success', 'Data stok barang berhasil dihapus.');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = StokBarang::with('divisi')->orderBy('nama_barang');
+
+        if ($request->filled('divisi_id')) {
+            $query->where('divisi_id', $request->integer('divisi_id'));
+        }
+
+        $stokBarangs = $query->get();
+
+        $divisiTerpilih = null;
+        if ($request->filled('divisi_id')) {
+            $divisiTerpilih = Divisi::find($request->integer('divisi_id'));
+        }
+
+        $pdf = Pdf::loadView('stok-barang.pdf', compact('stokBarangs', 'divisiTerpilih'))->setPaper('a4', 'landscape');
+
+        $namaFile = 'Stok-Barang-'.now()->format('Ymd-His').'.pdf';
+
+        return $pdf->download($namaFile);
     }
 }

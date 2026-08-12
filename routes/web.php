@@ -106,5 +106,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/stok-barang', [StokBarangController::class, 'store'])->name('stokBarang.store');
         Route::put('/stok-barang/{stokBarang}', [StokBarangController::class, 'update'])->name('stokBarang.update');
         Route::delete('/stok-barang/{stokBarang}', [StokBarangController::class, 'destroy'])->name('stokBarang.destroy');
+        Route::get('/stok-barang/export-pdf', [StokBarangController::class, 'exportPdf'])->name('stokBarang.exportPdf');
     });
 });

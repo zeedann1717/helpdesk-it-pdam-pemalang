@@ -17,6 +17,12 @@
             </div>
         @endif
 
+        @if (! auth()->user()->divisi_id)
+            <div class="alert alert-warning">
+                Akun Anda belum terdaftar di divisi manapun. Hubungi Super Admin untuk mengatur divisi akun Anda sebelum membuat tiket.
+            </div>
+        @endif
+
         <form action="{{ route('tiket.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row g-3">
@@ -30,14 +36,11 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label">Devisi</label>
-                    <select name="divisi_id" id="divisiSelect" class="form-select" required>
-                        <option value="">Pilih devisi...</option>
-                        @foreach ($divisis as $divisi)
-                            <option value="{{ $divisi->id }}" @selected(old('divisi_id') == $divisi->id || auth()->user()->divisi_id == $divisi->id)>
-                                {{ $divisi->nama_divisi }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <input type="text" class="form-control" value="{{ auth()->user()->divisi?->nama_divisi ?? 'Belum ada divisi' }}" disabled>
+                    {{-- Devisi dikunci sesuai akun yang login, tidak bisa dipilih bebas.
+                         Nilai sesungguhnya yang dipakai server tetap dari sesi login (lihat TiketController::store),
+                         input hidden ini hanya membantu JS memuat daftar lokasi. --}}
+                    <input type="hidden" id="divisiIdLocked" value="{{ auth()->user()->divisi_id }}">
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label">Unit / Perangkat Bermasalah</label>
@@ -46,12 +49,13 @@
                 <div class="col-12 col-md-6">
                     <label class="form-label">Lokasi</label>
                     <select name="lokasi_id" id="lokasiSelect" class="form-select" required disabled>
-                        <option value="">Pilih devisi dahulu...</option>
+                        <option value="">Memuat lokasi...</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label class="form-label">Foto Kendala/Masalah (opsional)</label>
-                    <input type="file" name="foto" class="form-control" accept="image/*">
+                    <label class="form-label">Foto Kendala/Masalah <span class="text-danger">*</span></label>
+                    <input type="file" name="foto" class="form-control" accept="image/*" required>
+                    <small class="text-muted">Wajib diisi sebagai dokumentasi kondisi sebelum diperbaiki.</small>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Kendala / Masalah</label>
@@ -59,7 +63,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mt-4 px-4">
+            <button type="submit" class="btn btn-primary mt-4 px-4" @disabled(! auth()->user()->divisi_id)>
                 <i class="fa-solid fa-paper-plane me-1"></i> Submit Tiket
             </button>
         </form>
@@ -70,25 +74,22 @@
 @push('scripts')
 <script>
 (function () {
-    const divisiSelect = document.getElementById('divisiSelect');
+    const divisiId = document.getElementById('divisiIdLocked').value;
     const lokasiSelect = document.getElementById('lokasiSelect');
     const oldLokasiId = '{{ old('lokasi_id') }}';
 
-    function loadLokasi(divisiId) {
-        if (!divisiId) {
-            lokasiSelect.innerHTML = '<option value="">Pilih devisi dahulu...</option>';
+    function loadLokasi(id) {
+        if (!id) {
+            lokasiSelect.innerHTML = '<option value="">Divisi akun belum diatur</option>';
             lokasiSelect.disabled = true;
             return;
         }
 
-        lokasiSelect.disabled = true;
-        lokasiSelect.innerHTML = '<option value="">Memuat lokasi...</option>';
-
-        fetch(`/lokasi/by-divisi/${divisiId}`, { headers: { 'Accept': 'application/json' } })
+        fetch(`/lokasi/by-divisi/${id}`, { headers: { 'Accept': 'application/json' } })
             .then(res => res.json())
             .then(data => {
                 if (data.length === 0) {
-                    lokasiSelect.innerHTML = '<option value="">Belum ada lokasi untuk devisi ini</option>';
+                    lokasiSelect.innerHTML = '<option value="">Belum ada lokasi untuk divisi ini</option>';
                     lokasiSelect.disabled = true;
                     return;
                 }
@@ -106,17 +107,10 @@
             });
     }
 
-    divisiSelect.addEventListener('change', function () {
-        loadLokasi(this.value);
-    });
-
-    // Kalau Divisi sudah terpilih dari awal (misal otomatis dari profil user), langsung fetch data lokasinya
-    if (divisiSelect.value) {
-        loadLokasi(divisiSelect.value);
-    }
+    loadLokasi(divisiId);
 })();
 
-// ==== TAMBAHAN: cegah submit ganda dengan menonaktifkan tombol setelah diklik ====
+// ==== Cegah submit ganda ====
 (function () {
     const form = document.querySelector('form[action="{{ route('tiket.store') }}"]');
     if (!form) return;
@@ -124,13 +118,12 @@
     form.addEventListener('submit', function (e) {
         const btn = this.querySelector('button[type="submit"]');
         if (btn.disabled) {
-            e.preventDefault(); // jaga-jaga kalau event sempat terpanggil dobel
+            e.preventDefault();
             return;
         }
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Mengirim...';
     });
 })();
-// ==== AKHIR TAMBAHAN ====
 </script>
 @endpush

@@ -62,46 +62,28 @@
                         <td>: {{ $tiket->keluhan }}</td>
                     </tr>
                     <tr>
-                        <td class="text-muted align-top">Foto</td>
+                        <td class="text-muted align-top">Foto Sebelum</td>
                         <td>
                             :
                             @if ($tiket->foto)
                                 <br>
                                 <a href="{{ asset('storage/'.$tiket->foto) }}" target="_blank">
-                                    <img src="{{ asset('storage/'.$tiket->foto) }}" alt="Foto kendala" class="img-fluid rounded mt-2" style="max-width:320px;">
+                                    <img src="{{ asset('storage/'.$tiket->foto) }}" alt="Foto sebelum (dari pelapor)" class="img-fluid rounded mt-2" style="max-width:320px;">
                                 </a>
                             @else
                                 Tidak ada foto
                             @endif
                         </td>
                     </tr>
-                    @if ($tiket->foto_sebelum || $tiket->foto_sesudah)
-                        <tr>
-                            <td class="text-muted align-top">Foto Sebelum</td>
-                            <td>
-                                :
-                                @if ($tiket->foto_sebelum)
-                                    <br>
-                                    <a href="{{ asset('storage/'.$tiket->foto_sebelum) }}" target="_blank">
-                                        <img src="{{ asset('storage/'.$tiket->foto_sebelum) }}" alt="Foto sebelum" class="img-fluid rounded mt-2" style="max-width:320px;">
-                                    </a>
-                                @else
-                                    Belum ada
-                                @endif
-                            </td>
-                        </tr>
+                    @if ($tiket->foto_sesudah)
                         <tr>
                             <td class="text-muted align-top">Foto Sesudah</td>
                             <td>
                                 :
-                                @if ($tiket->foto_sesudah)
-                                    <br>
-                                    <a href="{{ asset('storage/'.$tiket->foto_sesudah) }}" target="_blank">
-                                        <img src="{{ asset('storage/'.$tiket->foto_sesudah) }}" alt="Foto sesudah" class="img-fluid rounded mt-2" style="max-width:320px;">
-                                    </a>
-                                @else
-                                    Belum ada
-                                @endif
+                                <br>
+                                <a href="{{ asset('storage/'.$tiket->foto_sesudah) }}" target="_blank">
+                                    <img src="{{ asset('storage/'.$tiket->foto_sesudah) }}" alt="Foto sesudah diperbaiki" class="img-fluid rounded mt-2" style="max-width:320px;">
+                                </a>
                             </td>
                         </tr>
                     @endif
@@ -145,17 +127,6 @@
                         <div class="mb-3">
                             <label class="form-label">Catatan Admin (opsional)</label>
                             <textarea name="catatan_admin" rows="3" class="form-control">{{ $tiket->catatan_admin }}</textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Foto Sebelum Perbaikan</label>
-                            @if ($tiket->foto_sebelum)
-                                <div class="mb-2">
-                                    <a href="{{ asset('storage/'.$tiket->foto_sebelum) }}" target="_blank">
-                                        <img src="{{ asset('storage/'.$tiket->foto_sebelum) }}" alt="Foto sebelum" class="img-fluid rounded" style="max-width:200px;">
-                                    </a>
-                                </div>
-                            @endif
-                            <input type="file" name="foto_sebelum" class="form-control" accept="image/*">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Foto Sesudah Perbaikan</label>
@@ -215,7 +186,7 @@
     const emptyEl = document.getElementById('chatEmpty');
     const form = document.getElementById('chatForm');
     const input = document.getElementById('chatInput');
-    
+
     // Pastikan layout memiliki meta csrf-token
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     if (!csrfMeta) {
@@ -294,13 +265,14 @@
             .catch(err => {
                 alert('Gagal mengirim pesan: ' + err.message);
             })
-            .finally(() => { 
-                input.disabled = false; 
-                input.focus(); 
+            .finally(() => {
+                input.disabled = false;
+                input.focus();
             });
     });
 
-    // Fitur Broadcast/Websocket (Opsional)
+    // Fitur Broadcast/Websocket (Opsional) — cuma jalan kalau Echo BENERAN
+    // berhasil diinisialisasi di layouts/app.blade.php (lihat window.echoReady)
     if (window.echoReady) {
         window.Echo.private(`tiket.${tiketId}`).listen('.new-message', (e) => {
             if (e.sender_id === currentUserId) return;

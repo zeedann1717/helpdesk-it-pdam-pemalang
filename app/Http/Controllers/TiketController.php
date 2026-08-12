@@ -20,14 +20,23 @@ class TiketController extends Controller
     }
     public function store(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        // Divisi tiket SELALU dipaksa ikut divisi akun yang login, tidak boleh
+        // dipilih bebas dari form (mencegah tiket "nyasar" ke divisi lain,
+        // baik karena kesalahan maupun manipulasi form dari sisi client).
+        abort_unless($user->divisi_id, 422, 'Akun Anda belum terdaftar di divisi manapun.');
+
         $data = $request->validate([
-            'divisi_id' => ['required', 'exists:divisis,id'],
             'lokasi_id' => ['required', 'exists:lokasis,id'],
             'unit' => ['required', 'string', 'max:255'],
             'keluhan' => ['required', 'string', 'max:2000'],
-            'foto' => ['nullable', 'image', 'max:2048'],
+            'foto' => ['required', 'image', 'max:2048'],
         ]);
-        $data['user_id'] = $request->user()->id;
+
+        $data['divisi_id'] = $user->divisi_id;
+        $data['user_id'] = $user->id;
+
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('foto_tiket', 'public');
         }
@@ -107,17 +116,9 @@ class TiketController extends Controller
         $data = $request->validate([
             'status' => ['required', 'in:waiting,in_progress,done'],
             'catatan_admin' => ['nullable', 'string', 'max:2000'],
-            'foto_sebelum' => ['nullable', 'image', 'max:2048'],
             'foto_sesudah' => ['nullable', 'image', 'max:2048'],
         ]);
         $data['tanggal_selesai'] = $data['status'] === 'done' ? now() : null;
-
-        if ($request->hasFile('foto_sebelum')) {
-            if ($tiket->foto_sebelum) {
-                Storage::disk('public')->delete($tiket->foto_sebelum);
-            }
-            $data['foto_sebelum'] = $request->file('foto_sebelum')->store('foto_pengerjaan', 'public');
-        }
 
         if ($request->hasFile('foto_sesudah')) {
             if ($tiket->foto_sesudah) {

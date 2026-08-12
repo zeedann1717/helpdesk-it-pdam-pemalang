@@ -17,7 +17,6 @@ class Tiket extends Model
         'unit',
         'keluhan',
         'foto',
-        'foto_sebelum',
         'foto_sesudah',
         'status',
         'catatan_admin',

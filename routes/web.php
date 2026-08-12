@@ -8,6 +8,7 @@ use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\PerangkatController;
+use App\Http\Controllers\StokBarangController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\TiketChatController;
@@ -100,5 +101,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
         Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
+
+        Route::get('/stok-barang', [StokBarangController::class, 'index'])->name('stokBarang.index');
+        Route::post('/stok-barang', [StokBarangController::class, 'store'])->name('stokBarang.store');
+        Route::put('/stok-barang/{stokBarang}', [StokBarangController::class, 'update'])->name('stokBarang.update');
+        Route::delete('/stok-barang/{stokBarang}', [StokBarangController::class, 'destroy'])->name('stokBarang.destroy');
     });
 });

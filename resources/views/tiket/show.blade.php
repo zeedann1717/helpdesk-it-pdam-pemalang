@@ -75,6 +75,36 @@
                             @endif
                         </td>
                     </tr>
+                    @if ($tiket->foto_sebelum || $tiket->foto_sesudah)
+                        <tr>
+                            <td class="text-muted align-top">Foto Sebelum</td>
+                            <td>
+                                :
+                                @if ($tiket->foto_sebelum)
+                                    <br>
+                                    <a href="{{ asset('storage/'.$tiket->foto_sebelum) }}" target="_blank">
+                                        <img src="{{ asset('storage/'.$tiket->foto_sebelum) }}" alt="Foto sebelum" class="img-fluid rounded mt-2" style="max-width:320px;">
+                                    </a>
+                                @else
+                                    Belum ada
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted align-top">Foto Sesudah</td>
+                            <td>
+                                :
+                                @if ($tiket->foto_sesudah)
+                                    <br>
+                                    <a href="{{ asset('storage/'.$tiket->foto_sesudah) }}" target="_blank">
+                                        <img src="{{ asset('storage/'.$tiket->foto_sesudah) }}" alt="Foto sesudah" class="img-fluid rounded mt-2" style="max-width:320px;">
+                                    </a>
+                                @else
+                                    Belum ada
+                                @endif
+                            </td>
+                        </tr>
+                    @endif
                     <tr>
                         <td class="text-muted">Tanggal Dibuat</td>
                         <td>: {{ $tiket->created_at->format('d-m-Y H:i') }}</td>
@@ -101,7 +131,7 @@
             <div class="card stat-card mt-4">
                 <div class="card-header bg-white fw-semibold">Update Status Tiket</div>
                 <div class="card-body">
-                    <form action="{{ route('tiket.updateStatus', $tiket) }}" method="POST">
+                    <form action="{{ route('tiket.updateStatus', $tiket) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
@@ -115,6 +145,28 @@
                         <div class="mb-3">
                             <label class="form-label">Catatan Admin (opsional)</label>
                             <textarea name="catatan_admin" rows="3" class="form-control">{{ $tiket->catatan_admin }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Foto Sebelum Perbaikan</label>
+                            @if ($tiket->foto_sebelum)
+                                <div class="mb-2">
+                                    <a href="{{ asset('storage/'.$tiket->foto_sebelum) }}" target="_blank">
+                                        <img src="{{ asset('storage/'.$tiket->foto_sebelum) }}" alt="Foto sebelum" class="img-fluid rounded" style="max-width:200px;">
+                                    </a>
+                                </div>
+                            @endif
+                            <input type="file" name="foto_sebelum" class="form-control" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Foto Sesudah Perbaikan</label>
+                            @if ($tiket->foto_sesudah)
+                                <div class="mb-2">
+                                    <a href="{{ asset('storage/'.$tiket->foto_sesudah) }}" target="_blank">
+                                        <img src="{{ asset('storage/'.$tiket->foto_sesudah) }}" alt="Foto sesudah" class="img-fluid rounded" style="max-width:200px;">
+                                    </a>
+                                </div>
+                            @endif
+                            <input type="file" name="foto_sesudah" class="form-control" accept="image/*">
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fa-solid fa-floppy-disk me-1"></i> Simpan

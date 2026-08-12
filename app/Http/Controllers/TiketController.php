@@ -107,8 +107,25 @@ class TiketController extends Controller
         $data = $request->validate([
             'status' => ['required', 'in:waiting,in_progress,done'],
             'catatan_admin' => ['nullable', 'string', 'max:2000'],
+            'foto_sebelum' => ['nullable', 'image', 'max:2048'],
+            'foto_sesudah' => ['nullable', 'image', 'max:2048'],
         ]);
         $data['tanggal_selesai'] = $data['status'] === 'done' ? now() : null;
+
+        if ($request->hasFile('foto_sebelum')) {
+            if ($tiket->foto_sebelum) {
+                Storage::disk('public')->delete($tiket->foto_sebelum);
+            }
+            $data['foto_sebelum'] = $request->file('foto_sebelum')->store('foto_pengerjaan', 'public');
+        }
+
+        if ($request->hasFile('foto_sesudah')) {
+            if ($tiket->foto_sesudah) {
+                Storage::disk('public')->delete($tiket->foto_sesudah);
+            }
+            $data['foto_sesudah'] = $request->file('foto_sesudah')->store('foto_pengerjaan', 'public');
+        }
+
         $tiket->update($data);
         return back()->with('success', 'Status tiket berhasil diperbarui.');
     }

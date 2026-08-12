@@ -147,6 +147,9 @@
                 <a href="{{ route('laporan.index') }}" class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-file-lines me-2"></i> Laporan</span>
                 </a>
+                <a href="{{ route('stokBarang.index') }}" class="{{ request()->routeIs('stokBarang.*') ? 'active' : '' }}">
+                    <span><i class="fa-solid fa-boxes-stacked me-2"></i> Stok Barang</span>
+                </a>
 
                 {{-- TAMBAHAN BARU: Permintaan Reset Password (admin) --}}
                 <a href="{{ route('passwordRequests.index') }}" class="{{ request()->routeIs('passwordRequests.*') ? 'active' : '' }}">

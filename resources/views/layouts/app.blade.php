@@ -13,6 +13,17 @@
     <meta name="auth-is-admin" content="{{ auth()->user()->isAdmin() ? '1' : '0' }}">
     {{-- TAMBAHAN BARU: nama route saat ini, dipakai untuk auto-refresh saat tiket baru masuk --}}
     <meta name="route-name" content="{{ request()->route()->getName() }}">
+
+    {{-- ===== PWA ===== --}}
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0d3b8c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Helpdesk IT">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
+
     <title>@yield('title', 'Dashboard') - Help Desk IT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -52,6 +63,69 @@
         }
         @media (max-width: 767.98px) {
             .sidebar { min-height: auto; }
+        }
+
+        /* ==== Offcanvas drawer (mobile) tetap navy, jadi sidebar statis di desktop ==== */
+        .sidebar.offcanvas-md {
+            --bs-offcanvas-width: 270px;
+        }
+        @media (max-width: 767.98px) {
+            .sidebar.offcanvas-md {
+                background: #0d3b8c;
+            }
+            .sidebar .offcanvas-header {
+                border-bottom: 1px solid rgba(255,255,255,.15);
+            }
+            .sidebar .offcanvas-header .offcanvas-title {
+                color: #fff;
+                font-weight: 600;
+            }
+        }
+
+        /* ==== Bottom navigation (mobile only) ==== */
+        .bottom-nav {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            z-index: 1030;
+            background: #fff;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -4px 16px rgba(0,0,0,.06);
+            display: flex;
+            align-items: stretch;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 8px 4px 6px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: .68rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            position: relative;
+        }
+        .bottom-nav-item i { font-size: 1.15rem; }
+        .bottom-nav-item.active { color: #0d3b8c; }
+        .bottom-nav-badge {
+            position: absolute;
+            top: 2px;
+            right: calc(50% - 20px);
+            background: #ef4444;
+            color: #fff;
+            font-size: .6rem;
+            border-radius: 999px;
+            padding: 0 5px;
+            line-height: 14px;
+            display: none;
+        }
+        @media (max-width: 767.98px) {
+            .content-area { padding-bottom: 82px !important; }
         }
 
         /* ==== Notifikasi bell + badge ==== */
@@ -108,15 +182,19 @@
 </head>
 <body>
 <div class="d-flex flex-column flex-md-row">
-    <nav class="sidebar" style="width: 250px; flex-shrink: 0;">
-        <div class="brand d-flex align-items-center gap-2">
+    <nav class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebarDrawer" aria-labelledby="sidebarDrawerLabel" style="width: 250px; flex-shrink: 0;">
+        <div class="offcanvas-header d-md-none">
+            <span class="offcanvas-title" id="sidebarDrawerLabel">Menu</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebarDrawer" aria-label="Tutup"></button>
+        </div>
+        <div class="brand d-none d-md-flex align-items-center gap-2">
             <img src="{{ asset('images/logopdam.jpg') }}" alt="Logo PDAM" style="width:28px;height:28px;object-fit:contain;">
             <div>
                 <div class="fw-bold">Help Desk IT</div>
                 <small class="text-white-50">PDAM Tirta Mulia</small>
             </div>
         </div>
-        <div class="py-2">
+        <div class="py-2 offcanvas-body">
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <span><i class="fa-solid fa-house me-2"></i> Home</span>
             </a>
@@ -181,8 +259,13 @@
     </nav>
 
     <main class="flex-grow-1">
-        <div class="topbar d-flex align-items-center justify-content-between px-4 py-3">
-            <h5 class="mb-0">@yield('page-title', 'Dashboard')</h5>
+        <div class="topbar d-flex align-items-center justify-content-between px-3 px-md-4 py-3">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-link text-dark p-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarDrawer" aria-controls="sidebarDrawer" aria-label="Buka menu">
+                    <i class="fa-solid fa-bars fs-4"></i>
+                </button>
+                <h5 class="mb-0">@yield('page-title', 'Dashboard')</h5>
+            </div>
             <div class="d-flex align-items-center gap-3">
                 <button class="notif-bell" id="notifBell" title="Notifikasi pesan">
                     <i class="fa-regular fa-bell"></i>
@@ -198,7 +281,7 @@
             </div>
         </div>
 
-        <div class="p-4">
+        <div class="p-4 content-area">
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
                     {{ session('success') }}
@@ -216,6 +299,36 @@
         </div>
     </main>
 </div>
+
+{{-- ===== Bottom navigation, khusus mobile (<768px) ===== --}}
+<nav class="bottom-nav d-md-none">
+    <a href="{{ route('dashboard') }}" class="bottom-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <i class="fa-solid fa-house"></i><span>Home</span>
+    </a>
+    @if (auth()->user()->isAdmin())
+        <a href="{{ route('tiket.index') }}" class="bottom-nav-item {{ request()->routeIs('tiket.index') ? 'active' : '' }}">
+            <i class="fa-solid fa-ticket"></i><span>Tiket</span>
+            <span class="bottom-nav-badge" id="badgeTiketMasukBottom">0</span>
+        </a>
+        <a href="{{ route('tiket.waiting') }}" class="bottom-nav-item {{ request()->routeIs('tiket.waiting') ? 'active' : '' }}">
+            <i class="fa-solid fa-clock"></i><span>Waiting</span>
+        </a>
+        <button type="button" class="bottom-nav-item" data-bs-toggle="offcanvas" data-bs-target="#sidebarDrawer" aria-controls="sidebarDrawer">
+            <i class="fa-solid fa-bars"></i><span>Menu</span>
+        </button>
+    @else
+        <a href="{{ route('tiket.create') }}" class="bottom-nav-item {{ request()->routeIs('tiket.create') ? 'active' : '' }}">
+            <i class="fa-solid fa-plus"></i><span>Buat Tiket</span>
+        </a>
+        <a href="{{ route('tiket.my') }}" class="bottom-nav-item {{ request()->routeIs('tiket.my') ? 'active' : '' }}">
+            <i class="fa-solid fa-list-check"></i><span>Tiket Saya</span>
+            <span class="bottom-nav-badge" id="badgeTiketMasukBottom">0</span>
+        </a>
+        <a href="{{ route('profile.edit') }}" class="bottom-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-user-gear"></i><span>Profil</span>
+        </a>
+    @endif
+</nav>
 
 {{-- Kontainer toast pop-up notifikasi chat, ala notifikasi komentar Instagram --}}
 <div id="chatToastStack"></div>
@@ -255,14 +368,13 @@
 
     let unread = 0;
     const dot = document.getElementById('notifDot');
-    const navBadge = document.getElementById('badgeTiketMasuk');
 
     function updateBadges() {
         dot.style.display = unread > 0 ? 'block' : 'none';
-        if (navBadge) {
+        document.querySelectorAll('#badgeTiketMasuk, #badgeTiketMasukBottom').forEach((navBadge) => {
             navBadge.style.display = unread > 0 ? 'inline-block' : 'none';
             navBadge.textContent = unread > 99 ? '99+' : unread;
-        }
+        });
     }
 
     function showChatToast(payload) {
@@ -363,6 +475,15 @@
         updateBadges();
     });
 })();
+
+// ===== Registrasi Service Worker (PWA) =====
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.warn('Gagal mendaftarkan service worker:', err);
+        });
+    });
+}
 </script>
 @stack('scripts')
 </body>

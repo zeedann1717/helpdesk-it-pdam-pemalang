@@ -31,7 +31,7 @@ class TiketController extends Controller
             'lokasi_id' => ['required', 'exists:lokasis,id'],
             'unit' => ['required', 'string', 'max:255'],
             'keluhan' => ['required', 'string', 'max:2000'],
-            'foto' => ['required', 'image', 'max:2048'],
+            'foto' => ['required', 'image', 'max:10240'],
         ]);
 
         $data['divisi_id'] = $user->divisi_id;
@@ -116,7 +116,7 @@ class TiketController extends Controller
         $data = $request->validate([
             'status' => ['required', 'in:waiting,in_progress,done'],
             'catatan_admin' => ['nullable', 'string', 'max:2000'],
-            'foto_sesudah' => ['nullable', 'image', 'max:2048'],
+            'foto_sesudah' => ['nullable', 'image', 'max:10240'],
         ]);
         $data['tanggal_selesai'] = $data['status'] === 'done' ? now() : null;
 

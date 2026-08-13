@@ -13,7 +13,6 @@
     <meta name="auth-is-admin" content="{{ auth()->user()->isAdmin() ? '1' : '0' }}">
     {{-- TAMBAHAN BARU: nama route saat ini, dipakai untuk auto-refresh saat tiket baru masuk --}}
     <meta name="route-name" content="{{ request()->route()->getName() }}">
-
     {{-- ===== PWA ===== --}}
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <meta name="theme-color" content="#0d3b8c">
@@ -23,7 +22,6 @@
     <meta name="apple-mobile-web-app-title" content="Helpdesk IT">
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
-
     <title>@yield('title', 'Dashboard') - Help Desk IT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -225,6 +223,12 @@
                 <a href="{{ route('laporan.index') }}" class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-file-lines me-2"></i> Laporan</span>
                 </a>
+
+                @if (auth()->user()->isSuperAdmin())
+                    <a href="{{ route('statistik.index') }}" class="{{ request()->routeIs('statistik.*') ? 'active' : '' }}">
+                        <span><i class="fa-solid fa-chart-column me-2"></i> Statistik</span>
+                    </a>
+                @endif
                 <a href="{{ route('stokBarang.index') }}" class="{{ request()->routeIs('stokBarang.*') ? 'active' : '' }}">
                     <span><i class="fa-solid fa-boxes-stacked me-2"></i> Stok Barang</span>
                 </a>
@@ -488,4 +492,3 @@ if ('serviceWorker' in navigator) {
 @stack('scripts')
 </body>
 </html>
-PHPEOF

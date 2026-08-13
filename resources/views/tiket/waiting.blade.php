@@ -22,9 +22,16 @@
             </thead>
             <tbody>
                 @forelse ($tikets as $tiket)
-                    <tr>
+                    <tr class="{{ $tiket->pesan_baru_count > 0 ? 'table-warning' : '' }}">
                         <td>{{ $loop->iteration + ($tikets->currentPage() - 1) * $tikets->perPage() }}</td>
-                        <td>{{ $tiket->kode_tiket }}</td>
+                        <td>
+                            {{ $tiket->kode_tiket }}
+                            @if ($tiket->pesan_baru_count > 0)
+                                <span class="badge bg-danger ms-1" title="Ada pesan chat belum dibaca">
+                                    <i class="fa-solid fa-comment-dots"></i> {{ $tiket->pesan_baru_count }}
+                                </span>
+                            @endif
+                        </td>
                         <td>{{ $tiket->user->name }}</td>
                         <td>{{ $tiket->divisi?->nama_divisi ?? '-' }}</td>
                         <td>{{ $tiket->unit ?? '-' }}</td>

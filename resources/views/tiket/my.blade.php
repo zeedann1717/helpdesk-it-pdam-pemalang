@@ -22,7 +22,7 @@
                     <th>Kendala</th>
                     <th>Tanggal Buat</th>
                     <th>Status</th>
-                    <th style="width:90px"></th>
+                    <th style="width:220px"></th>
                 </tr>
             </thead>
             <tbody>
@@ -36,7 +36,19 @@
                         <td>{{ Str::limit($tiket->keluhan, 35) }}</td>
                         <td>{{ $tiket->created_at->format('d-m-Y H:i') }}</td>
                         <td><span class="badge {{ $tiket->statusBadgeClass() }}">{{ $tiket->statusLabel() }}</span></td>
-                        <td><a href="{{ route('tiket.show', $tiket) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ route('tiket.show', $tiket) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                @if ($tiket->status === 'waiting')
+                                    <a href="{{ route('tiket.edit', $tiket) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                    <form action="{{ route('tiket.destroy', $tiket) }}" method="POST" onsubmit="return confirm('Yakin hapus tiket {{ $tiket->kode_tiket }}?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
                     </tr>
                 @empty
                     <tr><td colspan="9" class="text-center text-muted py-4">Anda belum pernah membuat tiket.</td></tr>

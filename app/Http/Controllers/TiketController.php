@@ -50,7 +50,11 @@ class TiketController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Tiket::with(['user', 'divisi', 'lokasi'])->latest();
+        $query = Tiket::with(['user', 'divisi', 'lokasi'])
+            ->withCount(['messages as pesan_baru_count' => function ($q) use ($request) {
+                $q->where('user_id', '!=', $request->user()->id)->whereNull('read_at');
+            }])
+            ->latest();
 
         if ($request->user()->isAdminDivisi()) {
             $query->where('divisi_id', $request->user()->divisi_id);
@@ -72,6 +76,9 @@ class TiketController extends Controller
     public function waiting(Request $request): View
     {
         $query = Tiket::with(['user', 'divisi', 'lokasi'])
+            ->withCount(['messages as pesan_baru_count' => function ($q) use ($request) {
+                $q->where('user_id', '!=', $request->user()->id)->whereNull('read_at');
+            }])
             ->status('waiting')
             ->latest();
 
@@ -102,6 +109,65 @@ class TiketController extends Controller
         abort_unless($bolehLihat, 403);
         $tiket->load(['user', 'divisi', 'lokasi']);
         return view('tiket.show', compact('tiket'));
+    }
+    /**
+     * Cek apakah tiket masih boleh diedit/dihapus sendiri oleh user pembuatnya:
+     * harus pemilik tiket DAN statusnya masih 'waiting' (belum ditangani admin).
+     */
+    private function bolehDiubahUser(Request $request, Tiket $tiket): bool
+    {
+        return $tiket->user_id === $request->user()->id && $tiket->status === 'waiting';
+    }
+    /**
+     * Form edit tiket, khusus pemilik tiket & selama masih berstatus waiting.
+     */
+    public function edit(Request $request, Tiket $tiket): View
+    {
+        abort_unless($this->bolehDiubahUser($request, $tiket), 403, 'Tiket ini sudah tidak bisa diubah.');
+        $lokasis = Lokasi::where('divisi_id', $tiket->divisi_id)->orderBy('nama_lokasi')->get();
+        return view('tiket.edit', compact('tiket', 'lokasis'));
+    }
+    /**
+     * Simpan perubahan tiket milik user sendiri.
+     */
+    public function update(Request $request, Tiket $tiket): RedirectResponse
+    {
+        abort_unless($this->bolehDiubahUser($request, $tiket), 403, 'Tiket ini sudah tidak bisa diubah.');
+
+        $data = $request->validate([
+            'lokasi_id' => ['required', 'exists:lokasis,id'],
+            'unit' => ['required', 'string', 'max:255'],
+            'keluhan' => ['required', 'string', 'max:2000'],
+            'foto' => ['nullable', 'image', 'max:10240'],
+        ]);
+
+        if ($request->hasFile('foto')) {
+            if ($tiket->foto) {
+                Storage::disk('public')->delete($tiket->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('foto_tiket', 'public');
+        }
+
+        $tiket->update($data);
+        return redirect()
+            ->route('tiket.my')
+            ->with('success', 'Tiket '.$tiket->kode_tiket.' berhasil diperbarui.');
+    }
+    /**
+     * Hapus tiket milik user sendiri, selama masih berstatus waiting.
+     */
+    public function destroy(Request $request, Tiket $tiket): RedirectResponse
+    {
+        abort_unless($this->bolehDiubahUser($request, $tiket), 403, 'Tiket ini sudah tidak bisa dihapus.');
+
+        if ($tiket->foto) {
+            Storage::disk('public')->delete($tiket->foto);
+        }
+        $tiket->delete();
+
+        return redirect()
+            ->route('tiket.my')
+            ->with('success', 'Tiket '.$tiket->kode_tiket.' berhasil dihapus.');
     }
     /**
      * Update status tiket. Admin Divisi cuma boleh update tiket divisinya.

@@ -5,8 +5,6 @@
     <title>Hasil Pemeriksaan - {{ $pemeriksaan->perangkat->nama_perangkat }}</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 11px; color: #222; }
-        h2 { margin-bottom: 2px; }
-        .subtitle { color: #666; margin-top: 0; margin-bottom: 16px; font-size: 12px; }
         table.info { width: 100%; margin-bottom: 16px; }
         table.info td { padding: 3px 6px; vertical-align: top; }
         table.info td.label { width: 150px; color: #555; }
@@ -17,12 +15,17 @@
         .badge { padding: 2px 8px; border-radius: 4px; color: #fff; font-size: 10px; }
         .badge-layak { background-color: #198754; }
         .badge-tidak { background-color: #dc3545; }
-        .footer { margin-top: 30px; font-size: 10px; color: #777; }
+        .footer { margin-top: 14px; font-size: 9px; color: #777; }
     </style>
 </head>
 <body>
-    <h2>Hasil Pemeriksaan Berkala Perangkat</h2>
-    <p class="subtitle">PDAM Tirta Mulia — Help Desk IT</p>
+
+    @include('pdf.partials.kop', [
+        'judulLaporan' => 'Hasil Pemeriksaan Berkala Perangkat',
+        'subjudulLines' => [
+            $pemeriksaan->perangkat->kode_inventaris . ' — ' . $pemeriksaan->perangkat->nama_perangkat,
+        ],
+    ])
 
     <table class="info">
         <tr><td class="label">Perangkat</td><td>: {{ $pemeriksaan->perangkat->kode_inventaris }} — {{ $pemeriksaan->perangkat->nama_perangkat }}</td></tr>
@@ -65,6 +68,13 @@
             </tbody>
         </table>
     @endforeach
+
+    @include('pdf.partials.ttd', [
+        'diperiksaJabatan' => 'Kepala Divisi PDE',
+        'dibuatOlehJabatan' => 'Staf PDE',
+        'tampilkanDisetujui' => true,
+        'disetujuiJabatan' => 'Direktur Utama',
+    ])
 
     <div class="footer">
         Dicetak pada {{ now()->format('d-m-Y H:i') }} WIB

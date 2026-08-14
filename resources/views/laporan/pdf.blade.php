@@ -5,26 +5,27 @@
     <title>Laporan Tiket</title>
     <style>
         body { font-family: sans-serif; font-size: 11px; color: #222; }
-        h2, h4 { margin: 0; }
-        .header { text-align: center; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #999; padding: 5px 6px; text-align: left; }
-        th { background: #e9ecef; }
+        table.items { width: 100%; border-collapse: collapse; }
+        table.items th, table.items td { border: 1px solid #999; padding: 5px 6px; text-align: left; }
+        table.items th { background: #e9ecef; }
         .text-center { text-align: center; }
         .badge { padding: 2px 6px; border-radius: 4px; color: #fff; font-size: 10px; }
         .bg-waiting { background: #dc3545; }
         .bg-progress { background: #ffc107; color:#000; }
         .bg-done { background: #198754; }
+        .footer { margin-top: 14px; font-size: 9px; color: #777; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h2>PERUMDA AIR MINUM TIRTA MULIA KABUPATEN PEMALANG</h2>
-        <h4>Laporan Data Tiket Help Desk IT</h4>
-        <p>Periode: {{ $periode['dari'] }} s/d {{ $periode['sampai'] }} &nbsp;|&nbsp; Dicetak: {{ now()->format('d-m-Y H:i') }}</p>
-    </div>
 
-    <table>
+    @include('pdf.partials.kop', [
+        'judulLaporan' => 'Laporan Data Tiket Help Desk IT',
+        'subjudulLines' => [
+            'Periode: ' . $periode['dari'] . ' s/d ' . $periode['sampai'],
+        ],
+    ])
+
+    <table class="items">
         <thead>
             <tr>
                 <th>No</th>
@@ -68,5 +69,11 @@
             @endforelse
         </tbody>
     </table>
+
+    @include('pdf.partials.ttd')
+
+    <div class="footer">
+        Dicetak pada {{ now()->format('d-m-Y H:i') }} WIB
+    </div>
 </body>
 </html>

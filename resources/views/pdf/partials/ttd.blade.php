@@ -1,28 +1,32 @@
 {{--
     Partial kolom tanda tangan buat semua laporan PDF.
-    Default: cuma tampil 2 kolom (Diperiksa + Dibuat Oleh).
-    Variabel yang dipakai (semua opsional, ada default):
-    - $diperiksaJabatan     (string) jabatan kolom Diperiksa, default 'Admin Divisi IT'
-    - $dibuatOlehNama       (string) default nama user yang login
-    - $dibuatOlehJabatan    (string) default dari role user yang login
-    - $tampilkanDisetujui   (bool)   tampilkan blok "Disetujui" di bawah, default false
-    - $disetujuiJabatan     (string) jabatan blok Disetujui, default 'Direktur Utama'
-    - $tempatTanggal        (string) default 'Pemalang, {tanggal hari ini}'
+    Nama & jabatan diambil OTOMATIS dari halaman Pengaturan Dokumen
+    (menu "Pengaturan Dokumen", khusus Super Admin) — supaya kalau
+    penandatangan berganti, tinggal update di 1 tempat tanpa ubah kode.
+
+    Variabel di bawah SEMUA opsional; kalau diisi manual saat @include,
+    nilai manual itu yang menang (override), kalau tidak, otomatis
+    dari Pengaturan Dokumen:
+    - $diperiksaNama, $diperiksaJabatan, $diperiksaNpp
+    - $dibuatNama, $dibuatJabatan, $dibuatNpp
+    - $tampilkanDisetujui, $disetujuiNama, $disetujuiJabatan, $disetujuiNpp
+    - $tempatTanggal          default 'Pemalang, {tanggal hari ini}'
 --}}
 @php
-    $diperiksaJabatan  = $diperiksaJabatan  ?? 'Admin Divisi IT';
+    $pengaturanTtd = \App\Models\PengaturanDokumen::current();
 
-    $userTtd = auth()->user();
-    $dibuatOlehNama = $dibuatOlehNama ?? ($userTtd->name ?? '-');
-    $roleLabel = match ($userTtd->role ?? null) {
-        'super_admin' => 'Super Admin IT',
-        'admin_divisi' => 'Admin Divisi IT',
-        default => 'Petugas Help Desk IT',
-    };
-    $dibuatOlehJabatan = $dibuatOlehJabatan ?? $roleLabel;
+    $diperiksaNama    = $diperiksaNama    ?? $pengaturanTtd->diperiksa_nama;
+    $diperiksaJabatan = $diperiksaJabatan ?? ($pengaturanTtd->diperiksa_jabatan ?: 'Admin Divisi IT');
+    $diperiksaNpp     = $diperiksaNpp     ?? $pengaturanTtd->diperiksa_npp;
 
-    $tampilkanDisetujui = $tampilkanDisetujui ?? false;
-    $disetujuiJabatan   = $disetujuiJabatan   ?? 'Direktur Utama';
+    $dibuatNama    = $dibuatNama    ?? $pengaturanTtd->dibuat_nama;
+    $dibuatJabatan = $dibuatJabatan ?? ($pengaturanTtd->dibuat_jabatan ?: 'Petugas Help Desk IT');
+    $dibuatNpp     = $dibuatNpp     ?? $pengaturanTtd->dibuat_npp;
+
+    $tampilkanDisetujui = $tampilkanDisetujui ?? $pengaturanTtd->tampilkan_disetujui;
+    $disetujuiNama     = $disetujuiNama     ?? $pengaturanTtd->disetujui_nama;
+    $disetujuiJabatan  = $disetujuiJabatan  ?? ($pengaturanTtd->disetujui_jabatan ?: 'Direktur Utama');
+    $disetujuiNpp      = $disetujuiNpp      ?? $pengaturanTtd->disetujui_npp;
 
     $tempatTanggal = $tempatTanggal ?? ('Pemalang, ' . \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y'));
 @endphp
@@ -41,16 +45,16 @@
     </tr>
     <tr>
         <td style="width:50%; font-weight:bold; padding-top:2px;">{{ $diperiksaJabatan }}</td>
-        <td style="width:50%; font-weight:bold; padding-top:2px;">{{ $dibuatOlehJabatan }}</td>
+        <td style="width:50%; font-weight:bold; padding-top:2px;">{{ $dibuatJabatan }}</td>
     </tr>
     <tr><td style="height:55px;"></td><td></td></tr>
     <tr>
-        <td style="width:50%; font-weight:bold; border-top:1px solid #333; padding-top:3px;">&nbsp;</td>
-        <td style="width:50%; font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $dibuatOlehNama }}</td>
+        <td style="width:50%; font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $diperiksaNama ?: '&nbsp;' }}</td>
+        <td style="width:50%; font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $dibuatNama ?: '&nbsp;' }}</td>
     </tr>
     <tr>
-        <td style="width:50%; color:#666;">NPP: -</td>
-        <td style="width:50%; color:#666;">NPP: -</td>
+        <td style="width:50%; color:#666;">NPP: {{ $diperiksaNpp ?: '-' }}</td>
+        <td style="width:50%; color:#666;">NPP: {{ $dibuatNpp ?: '-' }}</td>
     </tr>
 </table>
 
@@ -64,10 +68,10 @@
         </tr>
         <tr><td style="height:55px;"></td></tr>
         <tr>
-            <td style="font-weight:bold; border-top:1px solid #333; padding-top:3px;">&nbsp;</td>
+            <td style="font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $disetujuiNama ?: '&nbsp;' }}</td>
         </tr>
         <tr>
-            <td style="color:#666;">NPP: -</td>
+            <td style="color:#666;">NPP: {{ $disetujuiNpp ?: '-' }}</td>
         </tr>
     </table>
 @endif

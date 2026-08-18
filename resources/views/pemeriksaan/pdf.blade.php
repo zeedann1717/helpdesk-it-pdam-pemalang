@@ -69,12 +69,7 @@
         </table>
     @endforeach
 
-    @include('pdf.partials.ttd', [
-        'diperiksaJabatan' => 'Kepala Divisi PDE',
-        'dibuatOlehJabatan' => 'Staf PDE',
-        'tampilkanDisetujui' => true,
-        'disetujuiJabatan' => 'Direktur Utama',
-    ])
+    @include('pdf.partials.ttd')
 
     <div class="footer">
         Dicetak pada {{ now()->format('d-m-Y H:i') }} WIB

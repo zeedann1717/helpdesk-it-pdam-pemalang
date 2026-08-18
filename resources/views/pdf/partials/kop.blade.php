@@ -25,9 +25,6 @@
             <div style="font-size:13px; font-weight:bold; color:#0d3b66;">
                 KABUPATEN PEMALANG
             </div>
-            <div style="font-size:9px; color:#666; margin-top:2px;">
-                Divisi Help Desk IT
-            </div>
         </td>
     </tr>
 </table>

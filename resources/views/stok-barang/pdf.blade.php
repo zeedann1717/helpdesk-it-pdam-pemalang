@@ -7,7 +7,7 @@
         body { font-family: Arial, sans-serif; font-size: 11px; color: #222; }
         table.items { width: 100%; border-collapse: collapse; }
         table.items th, table.items td { border: 1px solid #999; padding: 5px 7px; text-align: left; }
-        table.items th { background-color: #f0f0f0; }
+        th { background-color: #f0f0f0; }
         .badge { padding: 2px 8px; border-radius: 4px; color: #fff; font-size: 10px; }
         .badge-baik { background-color: #198754; }
         .badge-rusak { background-color: #dc3545; }

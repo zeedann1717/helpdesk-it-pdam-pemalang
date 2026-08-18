@@ -13,15 +13,6 @@
     <meta name="auth-is-admin" content="{{ auth()->user()->isAdmin() ? '1' : '0' }}">
     {{-- TAMBAHAN BARU: nama route saat ini, dipakai untuk auto-refresh saat tiket baru masuk --}}
     <meta name="route-name" content="{{ request()->route()->getName() }}">
-    {{-- ===== PWA ===== --}}
-    <link rel="manifest" href="{{ asset('manifest.json') }}">
-    <meta name="theme-color" content="#0d3b8c">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Helpdesk IT">
-    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
     <title>@yield('title', 'Dashboard') - Help Desk IT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -29,7 +20,7 @@
         body { background: #f4f6f9; }
         .sidebar {
             min-height: 100vh;
-            background: #0d3b8c;
+            background: #0d3b8c !important;
             color: #fff;
         }
         .sidebar .brand {
@@ -66,6 +57,17 @@
         /* ==== Offcanvas drawer (mobile) tetap navy, jadi sidebar statis di desktop ==== */
         .sidebar.offcanvas-md {
             --bs-offcanvas-width: 270px;
+        }
+        /* FIX BUG: Bootstrap otomatis bikin .offcanvas-body jadi display:flex tanpa
+           arah (default row) begitu masuk ukuran desktop (md ke atas). Ini bikin
+           semua link menu sidebar sejajar ke SAMPING alih-alih ke BAWAH. Dipaksa
+           balik jadi kolom vertikal di sini. */
+        @media (min-width: 768px) {
+            .sidebar.offcanvas-md .offcanvas-body {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
         @media (max-width: 767.98px) {
             .sidebar.offcanvas-md {
@@ -227,6 +229,9 @@
                 @if (auth()->user()->isSuperAdmin())
                     <a href="{{ route('statistik.index') }}" class="{{ request()->routeIs('statistik.*') ? 'active' : '' }}">
                         <span><i class="fa-solid fa-chart-column me-2"></i> Statistik</span>
+                    </a>
+                    <a href="{{ route('pengaturanDokumen.edit') }}" class="{{ request()->routeIs('pengaturanDokumen.*') ? 'active' : '' }}">
+                        <span><i class="fa-solid fa-file-signature me-2"></i> Pengaturan Dokumen</span>
                     </a>
                 @endif
                 <a href="{{ route('stokBarang.index') }}" class="{{ request()->routeIs('stokBarang.*') ? 'active' : '' }}">
@@ -480,12 +485,20 @@
     });
 })();
 
-// ===== Registrasi Service Worker (PWA) =====
+// ===== Bersihkan Service Worker (PWA) lama yang masih nyangkut di browser =====
+// Fitur PWA sudah dicabut dari project, tapi kalau browser sempat register
+// sw.js sebelumnya, dia akan tetap aktif ngontrol halaman & nge-cache asset
+// lama walau file sw.js sudah dihapus dari server -> bikin tampilan
+// (terutama sidebar/offcanvas) jadi rusak/transparan karena asset ke-serve
+// dari cache basi. Paksa unregister + hapus semua cache PWA di sini.
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch((err) => {
-            console.warn('Gagal mendaftarkan service worker:', err);
-        });
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((reg) => reg.unregister());
+    });
+}
+if ('caches' in window) {
+    caches.keys().then((keys) => {
+        keys.forEach((key) => caches.delete(key));
     });
 }
 </script>

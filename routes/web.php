@@ -7,6 +7,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\PemeriksaanController;
+use App\Http\Controllers\PengaturanDokumenController;
 use App\Http\Controllers\PerangkatController;
 use App\Http\Controllers\StatistikController;
 use App\Http\Controllers\StokBarangController;
@@ -107,6 +108,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
 
         Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik.index');
+
+        Route::get('/pengaturan-dokumen', [PengaturanDokumenController::class, 'edit'])->name('pengaturanDokumen.edit');
+        Route::put('/pengaturan-dokumen', [PengaturanDokumenController::class, 'update'])->name('pengaturanDokumen.update');
 
         Route::get('/stok-barang', [StokBarangController::class, 'index'])->name('stokBarang.index');
         Route::post('/stok-barang', [StokBarangController::class, 'store'])->name('stokBarang.store');

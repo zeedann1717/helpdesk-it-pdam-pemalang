@@ -11,31 +11,31 @@
         : null;
 @endphp
 
-<table style="width:100%; border-bottom: 2px solid #0d3b66; padding-bottom: 8px; margin-bottom: 14px;">
+<table style="width:100%; border-bottom: 2px solid #0d3b66; padding-bottom: 6px; margin-bottom: 10px;">
     <tr>
         @if ($logoBase64)
-            <td style="width:65px; vertical-align:middle;">
-                <img src="{{ $logoBase64 }}" style="width:55px; height:55px;">
+            <td style="width:55px; vertical-align:middle;">
+                <img src="{{ $logoBase64 }}" style="width:48px; height:48px;">
             </td>
         @endif
         <td style="vertical-align:middle;">
-            <div style="font-size:15px; font-weight:bold; color:#0d3b66; letter-spacing:0.3px;">
+            <div style="font-size:13.5px; font-weight:bold; color:#0d3b66; letter-spacing:0.3px;">
                 PERUMDA AIR MINUM TIRTA MULIA
             </div>
-            <div style="font-size:13px; font-weight:bold; color:#0d3b66;">
+            <div style="font-size:11.5px; font-weight:bold; color:#0d3b66;">
                 KABUPATEN PEMALANG
             </div>
         </td>
     </tr>
 </table>
 
-<div style="text-align:center; margin-bottom:16px;">
-    <div style="font-size:14px; font-weight:bold; text-decoration:underline; text-transform:uppercase;">
+<div style="text-align:center; margin-bottom:12px;">
+    <div style="font-size:13px; font-weight:bold; text-decoration:underline; text-transform:uppercase;">
         {{ $judulLaporan }}
     </div>
     @if (!empty($subjudulLines))
         @foreach ($subjudulLines as $line)
-            <div style="font-size:10.5px; color:#333; margin-top:2px;">{{ $line }}</div>
+            <div style="font-size:10px; color:#333; margin-top:2px;">{{ $line }}</div>
         @endforeach
     @endif
 </div>

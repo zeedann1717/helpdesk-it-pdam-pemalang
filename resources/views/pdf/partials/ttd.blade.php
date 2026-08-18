@@ -31,14 +31,15 @@
     $tempatTanggal = $tempatTanggal ?? ('Pemalang, ' . \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y'));
 @endphp
 
-<table style="width:100%; margin-top:10px; font-size:10.5px;">
+<div style="page-break-inside: avoid;">
+<table style="width:100%; margin-top:8px; font-size:10px;">
     <tr>
         <td style="width:50%;"></td>
         <td style="width:50%; text-align:center;">{{ $tempatTanggal }}</td>
     </tr>
 </table>
 
-<table style="width:100%; margin-top:6px; font-size:10.5px; text-align:center;">
+<table style="width:100%; margin-top:4px; font-size:10px; text-align:center;">
     <tr>
         <td style="width:50%;">Diperiksa</td>
         <td style="width:50%;">Dibuat Oleh</td>
@@ -47,7 +48,7 @@
         <td style="width:50%; font-weight:bold; padding-top:2px;">{{ $diperiksaJabatan }}</td>
         <td style="width:50%; font-weight:bold; padding-top:2px;">{{ $dibuatJabatan }}</td>
     </tr>
-    <tr><td style="height:55px;"></td><td></td></tr>
+    <tr><td style="height:42px;"></td><td></td></tr>
     <tr>
         <td style="width:50%; font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $diperiksaNama ?: '&nbsp;' }}</td>
         <td style="width:50%; font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $dibuatNama ?: '&nbsp;' }}</td>
@@ -59,14 +60,14 @@
 </table>
 
 @if ($tampilkanDisetujui)
-    <table style="width:220px; margin:22px auto 0; font-size:10.5px; text-align:center;">
+    <table style="width:200px; margin:16px auto 0; font-size:10px; text-align:center;">
         <tr>
             <td>Disetujui</td>
         </tr>
         <tr>
             <td style="font-weight:bold; padding-top:2px;">{{ $disetujuiJabatan }}</td>
         </tr>
-        <tr><td style="height:55px;"></td></tr>
+        <tr><td style="height:42px;"></td></tr>
         <tr>
             <td style="font-weight:bold; border-top:1px solid #333; padding-top:3px;">{{ $disetujuiNama ?: '&nbsp;' }}</td>
         </tr>
@@ -75,3 +76,4 @@
         </tr>
     </table>
 @endif
+</div>

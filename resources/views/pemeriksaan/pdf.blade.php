@@ -4,18 +4,18 @@
     <meta charset="utf-8">
     <title>Hasil Pemeriksaan - {{ $pemeriksaan->perangkat->nama_perangkat }}</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 11px; color: #222; }
-        table.info { width: 100%; margin-bottom: 16px; }
-        table.info td { padding: 3px 6px; vertical-align: top; }
-        table.info td.label { width: 150px; color: #555; }
-        table.items { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
-        table.items th, table.items td { border: 1px solid #999; padding: 5px 7px; text-align: left; }
-        table.items th { background-color: #f0f0f0; }
-        .kategori-title { font-weight: bold; color: #1a4d8f; margin: 14px 0 6px; font-size: 12px; }
-        .badge { padding: 2px 8px; border-radius: 4px; color: #fff; font-size: 10px; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 10.5px; color: #222; line-height: 1.35; }
+        table.info { width: 100%; margin-bottom: 12px; }
+        table.info td { padding: 3px 5px; vertical-align: top; }
+        table.info td.label { width: 140px; color: #555; }
+        table.items { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        table.items th, table.items td { border: 1px solid #999; padding: 4px 6px; text-align: left; }
+        table.items th { background-color: #f0f0f0; font-size: 10.5px; }
+        .kategori-title { font-weight: bold; color: #1a4d8f; margin: 10px 0 5px; font-size: 11.5px; }
+        .badge { padding: 1px 6px; border-radius: 3px; color: #fff; font-size: 9.5px; }
         .badge-layak { background-color: #198754; }
         .badge-tidak { background-color: #dc3545; }
-        .footer { margin-top: 14px; font-size: 9px; color: #777; }
+        .footer { margin-top: 12px; font-size: 9px; color: #777; }
     </style>
 </head>
 <body>
@@ -44,10 +44,10 @@
         <table class="items">
             <thead>
                 <tr>
-                    <th style="width:30px">No</th>
+                    <th style="width:28px">No</th>
                     <th>Item Pemeriksaan</th>
-                    <th style="width:90px">Kondisi</th>
-                    <th style="width:110px">Hasil</th>
+                    <th style="width:85px">Kondisi</th>
+                    <th style="width:100px">Hasil</th>
                     <th>Catatan</th>
                 </tr>
             </thead>
@@ -69,7 +69,7 @@
         </table>
     @endforeach
 
-    @include('pdf.partials.ttd')
+    @include('pdf.partials.ttd', ['tampilkanDisetujui' => false])
 
     <div class="footer">
         Dicetak pada {{ now()->format('d-m-Y H:i') }} WIB

@@ -32,7 +32,8 @@
                     <th>Divisi</th>
                     <th>Jumlah</th>
                     <th>Satuan</th>
-                    <th>Kondisi</th>
+                    <th>Kondisi Unit</th>
+                    <th>Kondisi Barang</th>
                     <th>Keterangan</th>
                     <th style="width:120px">Aksi</th>
                 </tr>
@@ -45,6 +46,7 @@
                         <td>{{ $s->jumlah }}</td>
                         <td>{{ $s->satuan }}</td>
                         <td><span class="badge {{ $s->kondisiBadgeClass() }}">{{ $s->kondisiLabel() }}</span></td>
+                        <td><span class="badge {{ $s->kondisiBarangBadgeClass() }}">{{ $s->kondisiBarangLabel() }}</span></td>
                         <td>{{ $s->keterangan ?? '-' }}</td>
                         <td>
                             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editStokModal{{ $s->id }}">
@@ -91,14 +93,23 @@
                                                 <input type="text" name="satuan" value="{{ $s->satuan }}" class="form-control" required placeholder="pcs, unit, meter, dll">
                                             </div>
                                         </div>
-                                        <div class="mb-3 mt-3">
-                                            <label class="form-label">Kondisi</label>
-                                            <select name="kondisi" class="form-select" required>
-                                                <option value="baik" @selected($s->kondisi === 'baik')>Baik</option>
-                                                <option value="rusak" @selected($s->kondisi === 'rusak')>Rusak</option>
-                                            </select>
+                                        <div class="row g-2 mt-1">
+                                            <div class="col-6">
+                                                <label class="form-label">Kondisi Unit</label>
+                                                <select name="kondisi" class="form-select" required>
+                                                    <option value="baik" @selected($s->kondisi === 'baik')>Baik</option>
+                                                    <option value="rusak" @selected($s->kondisi === 'rusak')>Rusak</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label">Kondisi Barang</label>
+                                                <select name="kondisi_barang" class="form-select" required>
+                                                    <option value="baru" @selected($s->kondisi_barang === 'baru')>Stok Baru</option>
+                                                    <option value="lama" @selected($s->kondisi_barang === 'lama')>Stok Lama</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="mb-3 mt-3">
                                             <label class="form-label">Keterangan</label>
                                             <textarea name="keterangan" rows="2" class="form-control">{{ $s->keterangan }}</textarea>
                                         </div>
@@ -112,7 +123,7 @@
                         </div>
                     </div>
                 @empty
-                    <tr><td colspan="7" class="text-center text-muted py-4">Belum ada data stok barang.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data stok barang.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -153,14 +164,23 @@
                             <input type="text" name="satuan" class="form-control" required placeholder="pcs, unit, meter, dll">
                         </div>
                     </div>
-                    <div class="mb-3 mt-3">
-                        <label class="form-label">Kondisi</label>
-                        <select name="kondisi" class="form-select" required>
-                            <option value="baik">Baik</option>
-                            <option value="rusak">Rusak</option>
-                        </select>
+                    <div class="row g-2 mt-1">
+                        <div class="col-6">
+                            <label class="form-label">Kondisi Unit</label>
+                            <select name="kondisi" class="form-select" required>
+                                <option value="baik">Baik</option>
+                                <option value="rusak">Rusak</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Kondisi Barang</label>
+                            <select name="kondisi_barang" class="form-select" required>
+                                <option value="baru">Stok Baru</option>
+                                <option value="lama">Stok Lama</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 mt-3">
                         <label class="form-label">Keterangan (opsional)</label>
                         <textarea name="keterangan" rows="2" class="form-control"></textarea>
                     </div>

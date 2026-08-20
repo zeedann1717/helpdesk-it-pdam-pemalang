@@ -57,7 +57,7 @@
                     <tr>
                         <td>{{ $loop->iteration + ($tikets->currentPage() - 1) * $tikets->perPage() }}</td>
                         <td>{{ $tiket->kode_tiket }}</td>
-                        <td>{{ $tiket->user->name }}</td>
+                        <td>{{ $tiket->user?->name ?? '-' }}</td>
                         <td>{{ $tiket->divisi?->nama_divisi ?? '-' }}</td>
                         <td>{{ $tiket->lokasi?->nama_lokasi ?? '-' }}</td>
                         <td>{{ Str::limit($tiket->keluhan, 30) }}</td>

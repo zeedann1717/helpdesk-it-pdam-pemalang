@@ -33,6 +33,7 @@ class StokBarangController extends Controller
             'jumlah' => ['required', 'integer', 'min:0'],
             'satuan' => ['required', 'string', 'max:50'],
             'kondisi' => ['required', 'in:baik,rusak'],
+            'kondisi_barang' => ['required', 'in:baru,lama'],
             'keterangan' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -51,6 +52,7 @@ class StokBarangController extends Controller
             'jumlah' => ['required', 'integer', 'min:0'],
             'satuan' => ['required', 'string', 'max:50'],
             'kondisi' => ['required', 'in:baik,rusak'],
+            'kondisi_barang' => ['required', 'in:baru,lama'],
             'keterangan' => ['nullable', 'string', 'max:500'],
         ]);
 

@@ -15,6 +15,7 @@ class StokBarang extends Model
         'jumlah',
         'satuan',
         'kondisi',
+        'kondisi_barang',
         'keterangan',
         'diinput_oleh',
     ];
@@ -37,5 +38,15 @@ class StokBarang extends Model
     public function kondisiLabel(): string
     {
         return $this->kondisi === 'baik' ? 'Baik' : 'Rusak';
+    }
+
+    public function kondisiBarangBadgeClass(): string
+    {
+        return $this->kondisi_barang === 'baru' ? 'bg-primary' : 'bg-secondary';
+    }
+
+    public function kondisiBarangLabel(): string
+    {
+        return $this->kondisi_barang === 'baru' ? 'Stok Baru' : 'Stok Lama';
     }
 }

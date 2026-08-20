@@ -59,7 +59,7 @@
                         <tr>
                             <td class="text-center">{{ $no }}</td>
                             <td>{{ $tiket->kode_tiket }}</td>
-                            <td>{{ $tiket->user->name }}</td>
+                            <td>{{ $tiket->user?->name ?? '-' }}</td>
                             <td>{{ $tiket->divisi?->nama_divisi ?? '-' }}</td>
                             <td>{{ $tiket->unit ?? '-' }}</td>
                             <td>{{ $tiket->lokasi?->nama_lokasi ?? '-' }}</td>
